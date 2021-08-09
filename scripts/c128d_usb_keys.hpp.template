@@ -1,0 +1,39 @@
+/** ${header_comment} */
+#ifndef C128D_USB_KEYS_H
+#define C128D_USB_KEYS_H
+
+#include <Arduino.h>
+
+// The number concurrently pressed keys that can be stored at one time
+#define KEY_BUFFER_SIZE 16
+
+// Sparse array containing all currently pressed keys. A 0x00 indicates an unused index.
+extern uint8_t usb_key_buffer[KEY_BUFFER_SIZE];
+
+struct PinState {
+    bool is_set;      // Is this pin set to GRD for output
+    uint8_t pin_num;  // Teensy3.6 output pin number
+};
+
+#define OUTPUT_PINS_COUNT ${output_pins_count}
+
+// Computed state of all output pins
+extern PinState* pins_state[OUTPUT_PINS_COUNT];
+
+struct KeyInfo {
+    bool is_sent;  // Is this USB key sent to the C128d?
+    PinState *row_pin;
+    PinState *col_pin;
+};
+
+// Teensy 3.6 digital output pin numbers for the C128d keyboard matrix
+${teensy36_output_pins}
+
+// The highest USB key code that will be used
+#define MAX_USB_KEY_CODE ${max_usb_key_code}
+
+// Every entry in the array refers to a one-byte USB key code
+extern KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1]; 
+
+
+#endif
