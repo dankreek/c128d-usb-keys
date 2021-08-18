@@ -26,7 +26,9 @@ void setup() {
 	while (!Serial) ; 
 	Serial.begin(115200);
 
-	// TODO: Clear the USB keyboard buffer
+	// Initialize data structures
+	initialize_pins_state();
+	initialize_usb_key_buffer();
 
 	// Setup USB Host and listen to the first keyboard found
 	usb_host.begin();
