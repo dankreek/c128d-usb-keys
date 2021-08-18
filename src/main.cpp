@@ -12,12 +12,16 @@ KeyboardController keyboard(usb_host);
 void OnRawPress(uint8_t keycode) {
 	Serial.print("raw key press: 0x");
 	Serial.println((int)keycode, HEX);
+
+	add_keycode_to_buffer(keycode);
 }
 
 
 void OnRawRelease(uint8_t keycode) {
 	Serial.print("raw key release: 0x");
 	Serial.println((int)keycode, HEX);
+
+	remove_keycode_from_buffer(keycode);
 }
 
 
