@@ -3,6 +3,7 @@
 #define C128D_USB_KEYS_H
 
 #include <Arduino.h>
+#include "USBHost_t36.h"
 
 // The number concurrently pressed keys that can be stored at one time
 #define KEY_BUFFER_SIZE 16
@@ -58,9 +59,107 @@ struct KeyInfo {
 // Every entry in the array refers to a one-byte USB key code
 extern KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1]; 
 
+#define USB_KEY_A          0x04
+#define USB_KEY_B          0x05
+#define USB_KEY_C          0x06
+#define USB_KEY_D          0x07
+#define USB_KEY_E          0x08
+#define USB_KEY_F          0x09
+#define USB_KEY_G          0x0a
+#define USB_KEY_H          0x0b
+#define USB_KEY_I          0x0c
+#define USB_KEY_K          0x0d
+#define USB_KEY_L          0x0f
+#define USB_KEY_M          0x10
+#define USB_KEY_N          0x11
+#define USB_KEY_O          0x12
+#define USB_KEY_P          0x13
+#define USB_KEY_Q          0x14
+#define USB_KEY_R          0x15
+#define USB_KEY_S          0x16
+#define USB_KEY_T          0x17
+#define USB_KEY_U          0x18
+#define USB_KEY_V          0x19
+#define USB_KEY_W          0x1a
+#define USB_KEY_X          0x1b
+#define USB_KEY_Y          0x1c
+#define USB_KEY_Z          0x1d
+#define USB_KEY_1          0x1e
+#define USB_KEY_2          0x1f
+#define USB_KEY_3          0x20
+#define USB_KEY_4          0x21
+#define USB_KEY_5          0x22
+#define USB_KEY_6          0x23
+#define USB_KEY_7          0x24
+#define USB_KEY_8          0x25
+#define USB_KEY_9          0x26
+#define USB_KEY_0          0x27
+#define USB_KEY_ENTER      0x28
+#define USB_KEY_ESC        0x29
+#define USB_KEY_BACKSPACE  0x2a
+#define USB_KEY_TAB        0x2b
+#define USB_KEY_SPACE      0x2c
+#define USB_KEY_MINUS      0x2d
+#define USB_KEY_EQUAL      0x2e
+#define USB_KEY_LBRACKET   0x2f
+#define USB_KEY_RBRACKET   0x30
+#define USB_KEY_BACKSLASH  0x31
+#define USB_KEY_SEMICOLON  0x33
+#define USB_KEY_APOSTROPHE 0x34
+#define USB_KEY_GRAVE      0x35
+#define USB_KEY_COMMA      0x36
+#define USB_KEY_DOT        0x37
+#define USB_KEY_SLASH      0x38
+#define USB_KEY_CAPS_LOCK  0x39
+#define USB_KEY_F1         0x3a
+#define USB_KEY_F2         0x3b
+#define USB_KEY_F3         0x3c
+#define USB_KEY_F4         0x3d
+#define USB_KEY_F5         0x3e
+#define USB_KEY_F6         0x3f
+#define USB_KEY_F7         0x40
+#define USB_KEY_F8         0x41
+#define USB_KEY_F9         0x42
+#define USB_KEY_F10        0x43
+#define USB_KEY_F11        0x44
+#define USB_KEY_F12        0x45
+#define USB_KEY_INSERT     0x49
+#define USB_KEY_HOME       0x4a
+#define USB_KEY_PGUP       0x4b
+#define USB_KEY_DELETE     0x4c
+#define USB_KEY_RIGHT      0x4f
+#define USB_KEY_LEFT       0x50
+#define USB_KEY_DOWN       0x51
+#define USB_KEY_UP         0x52
+#define USB_KEY_NUMLOCK    0x53
+#define USB_KEY_KP_MINUS   0x56
+#define USB_KEY_KP_PLUS    0x57
+#define USB_KEY_KP_ENTER   0x58
+#define USB_KEY_KP_0       0x59
+#define USB_KEY_KP_1       0x5a
+#define USB_KEY_KP_2       0x5b
+#define USB_KEY_KP_3       0x5c
+#define USB_KEY_KP_4       0x5d
+#define USB_KEY_KP_5       0x5e
+#define USB_KEY_KP_6       0x5f
+#define USB_KEY_KP_7       0x60
+#define USB_KEY_KP_8       0x61
+#define USB_KEY_KP_9       0x62
+#define USB_KEY_KP_DOT     0x63
+#define USB_KEY_COMPOSE    0x65
+#define USB_KEY_LCTRL      0x67
+#define USB_KEY_LSHIFT     0x68
+#define USB_KEY_LALT       0x69
+#define USB_KEY_LMETA      0x6a
+#define USB_KEY_RSHIFT     0x6c
+#define USB_KEY_RCTRL      0x6b
+#define USB_KEY_RALT       0x6d
+#define USB_KEY_RMETA      0x6e
+
+
 void initialize_usb_key_buffer();
-void initialize_pins_state();
 void add_keycode_to_buffer(uint8_t key_code);
 void remove_keycode_from_buffer(uint8_t key_code);
+void update_output_pins(KeyboardController keyboard_controller);
 
 #endif
