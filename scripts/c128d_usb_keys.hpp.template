@@ -42,5 +42,6 @@ void initialize_usb_key_buffer();
 void add_keycode_to_buffer(uint8_t key_code);
 void remove_keycode_from_buffer(uint8_t key_code);
 void update_output_pins(KeyboardController keyboard_controller);
+void initialize_lock_key_state();
 
 #endif

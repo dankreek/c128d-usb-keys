@@ -191,7 +191,7 @@ def main(args: List[str]) -> int:
 
     max_usb_key_code = max(key_codes.keys())
 
-    with open(path.join('..', 'include', 'c128d_usb_keys.hpp'), 'w') as f:
+    with open(path.join(this_dir, '..', 'include', 'c128d_usb_keys.hpp'), 'w') as f:
         f.write(usb_keys_template.substitute(
             header_comment=header_comment, 
             max_usb_key_code=hex(max_usb_key_code),
@@ -223,7 +223,7 @@ def main(args: List[str]) -> int:
         pins_set_array += f'    &{pin.name},'
         pins_set_array += '\n'
 
-    with open(path.join('..', 'src', 'key_mapping.cpp'), 'w') as f:
+    with open(path.join(this_dir, '..', 'src', 'key_mapping.cpp'), 'w') as f:
         f.write(key_mapping_template.substitute(
             header_comment=header_comment,
             usb_key_mapping=usb_key_mapping,
