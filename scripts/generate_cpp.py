@@ -159,11 +159,11 @@ key_codes: Dict[int, KeyInfo] = {
     0x6e: KeyInfo('RMETA', None, None),
 }
 
-numlock_keycodes: Dict[int, KeyInfo] = {
-    0x5b: KeyInfo('KP_2', 'KP_↓', (Matrix.Row4, Matrix.K2)),
-    0x5d: KeyInfo('KP_4', 'KP_←', (Matrix.Row5, Matrix.K2)),
-    0x5f: KeyInfo('KP_6', 'KP_→', (Matrix.Row6, Matrix.K2)),
-    0x61: KeyInfo('KP_8', 'KP_↑', (Matrix.Row3, Matrix.K2)),
+numlock_off_keycodes: Dict[int, KeyInfo] = {
+    0x5b: KeyInfo('KP_2', 'TOP_ROW_↓', (Matrix.Row4, Matrix.K2)),
+    0x5d: KeyInfo('KP_4', 'TOP_ROW_←', (Matrix.Row5, Matrix.K2)),
+    0x5f: KeyInfo('KP_6', 'TOP_ROW_→', (Matrix.Row6, Matrix.K2)),
+    0x61: KeyInfo('KP_8', 'TOP_ROW_↑', (Matrix.Row3, Matrix.K2)),
 }
 
 def output_pin_name(pin: Matrix) -> str:
@@ -217,6 +217,12 @@ def main(args: List[str]) -> int:
             usb_key_mapping += '{0:32} // {1} => {2}\n'.format(mapping, usb_key_name(key_info.name), key_info.c128_name)
         else:
             usb_key_mapping += '{false, NULL, NULL},\n'
+    
+    numlock_off_key_mapping = ''
+    for key_code_num, key_info in numlock_off_keycodes.items():
+        numlock_off_key_mapping += f'KeyInfo numlock_off_{key_info.name.lower()} {{true, &{key_info.matrix[0].name}, &{key_info.matrix[1].name}}};'
+        numlock_off_key_mapping += f'     // {usb_key_name(key_info.name)} => {key_info.c128_name}\n'
+
 
     pins_set_array = ''
     for pin in Matrix:
@@ -228,7 +234,8 @@ def main(args: List[str]) -> int:
             header_comment=header_comment,
             usb_key_mapping=usb_key_mapping,
             pins_set_array=pins_set_array,
-            output_pins=output_pins
+            output_pins=output_pins,
+            numlock_off_key_mapping=numlock_off_key_mapping
         ))
 
     return 0

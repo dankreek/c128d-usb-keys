@@ -141,6 +141,11 @@ KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1] = {
     /* 0x6e */  {false, NULL, NULL},
 };
 
+KeyInfo numlock_off_kp_2 {true, &Row4, &K2};     // USB_KEY_KP_2 => TOP_ROW_↓
+KeyInfo numlock_off_kp_4 {true, &Row5, &K2};     // USB_KEY_KP_4 => TOP_ROW_←
+KeyInfo numlock_off_kp_6 {true, &Row6, &K2};     // USB_KEY_KP_6 => TOP_ROW_→
+KeyInfo numlock_off_kp_8 {true, &Row3, &K2};     // USB_KEY_KP_8 => TOP_ROW_↑
+
 PinState* pins_state[OUTPUT_PINS_COUNT] = {
     &Row0,
     &Row1,

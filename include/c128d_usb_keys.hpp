@@ -59,6 +59,12 @@ struct KeyInfo {
 // Every entry in the array refers to a one-byte USB key code
 extern KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1]; 
 
+// Mappings for the keypad when numlock is off
+extern KeyInfo numlock_off_kp_2;
+extern KeyInfo numlock_off_kp_4;
+extern KeyInfo numlock_off_kp_6;
+extern KeyInfo numlock_off_kp_8;
+
 #define USB_KEY_A          0x04
 #define USB_KEY_B          0x05
 #define USB_KEY_C          0x06

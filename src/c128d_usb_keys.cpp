@@ -99,6 +99,11 @@ void _apply_keyboard_output_pins_state() {
 }
 
 
+bool _is_keypad_key(uint8_t key_code) {
+    return ((key_code >= USB_KEY_KP_MINUS) && (key_code <= USB_KEY_KP_DOT));
+}
+
+
 void update_output_pins(KeyboardController keyboard_controller) {
     _reset_keyboard_output_pins_state();
 
@@ -126,7 +131,31 @@ void update_output_pins(KeyboardController keyboard_controller) {
             else if (usb_key_code == USB_KEY_F7) {
                 _toggle_4080_lock_state();
             }
-            // This is not a lock key send it as is
+            // Handle keypad digits depending on numlock state
+            else if (_is_keypad_key(usb_key_code)) {
+                // If numlock is on send the key as normal (c128 number pad)
+                if (keyboard_controller.numLock()) {
+                    _set_output_key(usb_key_mapping[usb_key_code]);
+                } 
+                // If numlock is off and one of the "arrow" digits is pressed, send the C128 top-row cursor key
+                else {
+                    switch (usb_key_code) {
+                        case USB_KEY_KP_2:
+                            _set_output_key(numlock_off_kp_2);
+                            break;
+                        case USB_KEY_KP_4:
+                            _set_output_key(numlock_off_kp_4);
+                            break;
+                        case USB_KEY_KP_6:
+                            _set_output_key(numlock_off_kp_6);
+                            break;
+                        case USB_KEY_KP_8:
+                            _set_output_key(numlock_off_kp_8);
+                            break;
+                    }
+                }
+            }
+            // This is not a lock key or keypad digit so send it as is
             else {
                 _set_output_key(usb_key_mapping[usb_key_code]);
             }
