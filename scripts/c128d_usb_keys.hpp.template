@@ -39,6 +39,7 @@ extern KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1];
 ${usb_key_defs}
 
 void initialize_usb_key_buffer();
+void initialize_keyboard_output_pins(); 
 void add_keycode_to_buffer(uint8_t key_code);
 void remove_keycode_from_buffer(uint8_t key_code);
 void update_output_pins(KeyboardController keyboard_controller);
