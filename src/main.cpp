@@ -9,7 +9,7 @@ USBHub hub2(usb_host);
 KeyboardController keyboard(usb_host);
 
 
-void OnRawPress(uint8_t keycode) {
+void on_raw_press(uint8_t keycode) {
 	Serial.print("raw key press: 0x");
 	Serial.println((int)keycode, HEX);
 
@@ -25,7 +25,7 @@ void OnRawPress(uint8_t keycode) {
 }
 
 
-void OnRawRelease(uint8_t keycode) {
+void on_raw_release(uint8_t keycode) {
 	Serial.print("raw key release: 0x");
 	Serial.println((int)keycode, HEX);
 
@@ -47,8 +47,8 @@ void setup() {
 
 	// Setup USB Host and listen to the first keyboard found
 	usb_host.begin();
-	keyboard.attachRawPress(OnRawPress);
-	keyboard.attachRawRelease(OnRawRelease);
+	keyboard.attachRawPress(on_raw_press);
+	keyboard.attachRawRelease(on_raw_release);
 }
 
 
