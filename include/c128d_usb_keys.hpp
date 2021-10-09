@@ -4,6 +4,7 @@
 
 #include <Arduino.h>
 #include "USBHost_t36.h"
+#include "lock_key.hpp"
 
 // The number concurrently pressed keys that can be stored at one time
 #define KEY_BUFFER_SIZE 16
@@ -162,6 +163,9 @@ extern KeyInfo numlock_off_kp_8;
 #define USB_KEY_RALT       0x6d
 #define USB_KEY_RMETA      0x6e
 
+
+extern LockKey c128d_caps_lock;
+extern LockKey c128d_40_80;
 
 void initialize_usb_key_buffer();
 void initialize_keyboard_output_pins(); 

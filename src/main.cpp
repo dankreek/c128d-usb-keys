@@ -13,7 +13,15 @@ void OnRawPress(uint8_t keycode) {
 	Serial.print("raw key press: 0x");
 	Serial.println((int)keycode, HEX);
 
-	add_keycode_to_buffer(keycode);
+	if (keycode == c128d_caps_lock.usb_key_code()) {
+		c128d_caps_lock.toggle_on_state();
+	}
+	else if (keycode == c128d_40_80.usb_key_code()) {
+		c128d_40_80.toggle_on_state();
+	}
+	else {
+		add_keycode_to_buffer(keycode);
+	}
 }
 
 
@@ -21,7 +29,9 @@ void OnRawRelease(uint8_t keycode) {
 	Serial.print("raw key release: 0x");
 	Serial.println((int)keycode, HEX);
 
-	remove_keycode_from_buffer(keycode);
+	if ((keycode != c128d_caps_lock.usb_key_code()) && (keycode != c128d_40_80.usb_key_code())) {
+		remove_keycode_from_buffer(keycode);
+	}
 }
 
 
