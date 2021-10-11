@@ -17,19 +17,26 @@ void initialize_lock_key_state() {
     c128d_40_80.set_is_on(false);
 }
 
-
+/**
+ * Clear out the USB keyboard buffer, which is a sparse array that contains
+ * all keys currently pressed on the keyboard. A value of 0 indicates that no
+ * key is pressed.
+ */
 void initialize_usb_key_buffer() {
     for (int i=0; i < KEY_BUFFER_SIZE; i++) {
         usb_key_buffer[0] = 0;
     }
 }
 
-
+/**
+ * Initialize the pin state structs and the output pins  to the INPUT state 
+ * which the C128D sees as "no connection." 
+ */
 void initialize_keyboard_output_pins() {
     for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
         pins_state[i]->is_set = false;
 
-        // Set output to digital low to be safe
+        // Set output to digital low to be safe. This probably isn't necessary.
         pinMode(pins_state[i]->pin_num, OUTPUT);
         digitalWrite(pins_state[i]->pin_num, LOW);
 
@@ -92,6 +99,14 @@ bool _is_keypad_key(uint8_t key_code) {
 }
 
 
+/**
+ * 1. Reset the buffered output pin states.
+ * 2. Recalculate the output pin states based on the contents of the keyboard
+ *    buffer and the current state of the USB caps-lock key (which emulates
+ *    the C128D's shift-lock key), and the C128D caps-lock and 40/80 lock keys.
+ * 3. Once the buffered state has been set, apply the state to the actual 
+ *    output pins. 
+ */
 void update_output_pins(KeyboardController keyboard_controller) {
     _reset_keyboard_output_pins_state();
 
@@ -126,7 +141,8 @@ void update_output_pins(KeyboardController keyboard_controller) {
                 if (keyboard_controller.numLock()) {
                     _set_output_key(usb_key_mapping[usb_key_code]);
                 } 
-                // If numlock is off and one of the "arrow" digits is pressed, send the C128 top-row cursor key
+                // If numlock is off and one of the "arrow" digits is pressed, 
+                // send the C128 top-row cursor key
                 else {
                     switch (usb_key_code) {
                         case USB_KEY_KP_2:

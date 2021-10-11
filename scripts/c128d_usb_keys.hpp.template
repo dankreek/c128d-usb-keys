@@ -12,6 +12,7 @@
 // Sparse array containing all currently pressed keys. A 0x00 indicates an unused index.
 extern uint8_t usb_key_buffer[KEY_BUFFER_SIZE];
 
+// Represents the state of an output pin, which is calculated on every pass of the main loop
 struct PinState {
     bool is_set;      // Is this pin set to GRD for output
     uint8_t pin_num;  // Teensy3.6 output pin number
@@ -19,9 +20,14 @@ struct PinState {
 
 #define OUTPUT_PINS_COUNT ${output_pins_count}
 
-// Computed state of all output pins
+/**
+ * An array of all PinState's which represent the calculated state of all 
+ * output pins. This is main for conveniently reseting the buffered state of 
+ * every output pin before the new states are calculated from usb_key_buffer.
+ */
 extern PinState* pins_state[OUTPUT_PINS_COUNT];
 
+// Describes a mapping of a USB keyboard key to the keyboard matrix on a C128D.
 struct KeyInfo {
     bool is_sent;  // Is this USB key sent to the C128d?
     PinState *row_pin;
@@ -34,7 +40,12 @@ ${teensy36_output_pins}
 // The highest USB key code that will be used
 #define MAX_USB_KEY_CODE ${max_usb_key_code}
 
-// Every entry in the array refers to a one-byte USB key code
+/**
+ * Every entry in the array refers to a USB key code. Any key code which isn't
+ * directly sent to the C128D will have is_sent set to false, otherwise is_sent
+ * will be set to true, and row_pin and col_pin will point to the KeyInfo 
+ * which indicates which Teensy output pins are set to OUTPUT LOW.
+ */
 extern KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1]; 
 
 // Mappings for the keypad when numlock is off
@@ -45,6 +56,19 @@ extern KeyInfo numlock_off_kp_8;
 
 ${usb_key_defs}
 
+/** 
+ * On the C128D hardware keyboard the Caps Lock, and 40/80 keys are physically
+ * locked by hardware. This USB keyboard adapter emulates that behavior by 
+ * toggling the on/off state on a single key press. 
+ * 
+ * The code to handle this in the update_output_pins function called by the 
+ * main loop ended up being way too complicated so these data structures exist
+ * to simplify that. 
+ * 
+ * The lock state is toggled by the USB keyboard callbacks, and the 
+ * update_output_pins function will set the output pins according to their set
+ * state.
+ */ 
 extern LockKey c128d_caps_lock;
 extern LockKey c128d_40_80;
 
