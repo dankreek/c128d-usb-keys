@@ -1,7 +1,7 @@
 #ifndef LOCK_KEY_HPP
 #define LOCK_KEY_HPP
 
-#include <Arduino.h>
+#include <stdint.h>
 
 
 class LockKey {
