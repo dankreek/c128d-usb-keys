@@ -2,7 +2,7 @@
 #define USB_KEY_BUFFER_HPP
 
 #include <stdint.h>
-
+#include <functional>
 
 class USBKeyBuffer {
     public:
@@ -24,9 +24,15 @@ class USBKeyBuffer {
          */
         void remove(uint8_t key_code);
 
+        /**
+         * @param callback - A callback function to handle each key code 
+         *                   contained in the buffer
+         */
+        void for_each(std::function<void(const uint8_t)> callback);
+
         // Sparse array containing all currently pressed keys. 
         // (A value of 0x00 indicates an unused index.)
-        // TODO: Make this private and a friend to system container class
+        // TODO: Make this private once the for_each function has been used
         uint8_t key_buffer[KEY_BUFFER_SIZE];
 };
 

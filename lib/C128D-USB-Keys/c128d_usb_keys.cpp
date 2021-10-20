@@ -79,7 +79,7 @@ bool _is_keypad_key(uint8_t key_code) {
  * 3. Once the buffered state has been set, apply the state to the actual 
  *    output pins. 
  */
-void update_output_pins(KeyboardController keyboard_controller) {
+void update_output_pins(const KeyboardController keyboard_controller) {
     _reset_keyboard_output_pins_state();
 
     if (c128d_caps_lock.is_on()) {
@@ -91,11 +91,9 @@ void update_output_pins(KeyboardController keyboard_controller) {
     }
 
     // Set output pins state for every key in the buffer
-    for (int i=0; i < USBKeyBuffer::KEY_BUFFER_SIZE; i++) {
-        uint8_t usb_key_code = key_buffer.key_buffer[i];
-
+    key_buffer.for_each([&keyboard_controller](uint8_t usb_key_code) {
         // If this is a pressed key, and is within the accepted range 
-        if ((usb_key_code > 0) && (usb_key_code <= MAX_USB_KEY_CODE)) {
+        if (usb_key_code <= MAX_USB_KEY_CODE) {
             // If caps lock is on, set left-shift (emulates shift-lock on C128D keyboard)
             if (keyboard_controller.capsLock()) {
                 _set_output_key(usb_key_mapping[USB_KEY_LSHIFT]);
@@ -137,7 +135,7 @@ void update_output_pins(KeyboardController keyboard_controller) {
                 _set_output_key(usb_key_mapping[usb_key_code]);
             }
         }
-    }
+    });
 
     _apply_keyboard_output_pins_state();
 }

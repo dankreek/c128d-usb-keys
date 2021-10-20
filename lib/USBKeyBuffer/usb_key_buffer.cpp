@@ -31,3 +31,12 @@ void USBKeyBuffer::remove(uint8_t key_code) {
         }
     }
 }
+
+
+void USBKeyBuffer::for_each(std::function<void(const uint8_t)> callback) {
+    for (int i=0; i < KEY_BUFFER_SIZE; i++) {
+        if (key_buffer[i] != 0) {
+            callback(key_buffer[i]);
+        }
+    }
+}
