@@ -30,9 +30,15 @@ class USBKeyBuffer {
          */
         void for_each(std::function<void(const uint8_t)> callback);
 
+
+        /*
+         * @returns the number of keys stored in the buffer
+         */
+        int count(); 
+
+    private:
         // Sparse array containing all currently pressed keys. 
         // (A value of 0x00 indicates an unused index.)
-        // TODO: Make this private once the for_each function has been used
         uint8_t key_buffer[KEY_BUFFER_SIZE];
 };
 
