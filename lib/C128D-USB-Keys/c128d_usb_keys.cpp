@@ -1,14 +1,13 @@
 #include <Arduino.h>
 #include "USBHost_t36.h"
 #include "c128d_usb_keys.hpp"
-#include "lock_key.hpp"
 #include "key_mapping.hpp"
-#include "usb_key_buffer.hpp"
 
 
 #define C128_KEY_CAPSLOCK_TOGGLE USB_KEY_F4
 #define C128_KEY_4080_TOGGLE     USB_KEY_F7
 
+USBKeyBuffer key_buffer;
 
 LockKey c128d_caps_lock(0, USB_KEY_F4);
 LockKey c128d_40_80(0, USB_KEY_F7);
@@ -92,8 +91,8 @@ void update_output_pins(KeyboardController keyboard_controller) {
     }
 
     // Set output pins state for every key in the buffer
-    for (int i=0; i < KEY_BUFFER_SIZE; i++) {
-        uint8_t usb_key_code = usb_key_buffer[i];
+    for (int i=0; i < USBKeyBuffer::KEY_BUFFER_SIZE; i++) {
+        uint8_t usb_key_code = key_buffer.key_buffer[i];
 
         // If this is a pressed key, and is within the accepted range 
         if ((usb_key_code > 0) && (usb_key_code <= MAX_USB_KEY_CODE)) {

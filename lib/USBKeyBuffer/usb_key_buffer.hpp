@@ -3,15 +3,31 @@
 
 #include <stdint.h>
 
-// The number concurrently pressed keys that can be stored at one time
-#define KEY_BUFFER_SIZE 16
 
-// Sparse array containing all currently pressed keys. A 0x00 indicates an unused index.
-extern uint8_t usb_key_buffer[KEY_BUFFER_SIZE];
+class USBKeyBuffer {
+    public:
+        // The number of keys that can be stored in the buffer at once
+        int static const KEY_BUFFER_SIZE = 16;
 
+        /**
+         * Default constructor which initializes the internal key_buffer
+         */
+        USBKeyBuffer();
+    
+        /**
+         * @param key_code - The USB keycode to add to the bufer
+         */
+        void add(uint8_t key_code);
 
-void initialize_usb_key_buffer();
-void add_keycode_to_buffer(uint8_t key_code);
-void remove_keycode_from_buffer(uint8_t key_code);
+        /**
+         * @param key_code - The USB keycode to remove from the buffer
+         */
+        void remove(uint8_t key_code);
+
+        // Sparse array containing all currently pressed keys. 
+        // (A value of 0x00 indicates an unused index.)
+        // TODO: Make this private and a friend to system container class
+        uint8_t key_buffer[KEY_BUFFER_SIZE];
+};
 
 #endif

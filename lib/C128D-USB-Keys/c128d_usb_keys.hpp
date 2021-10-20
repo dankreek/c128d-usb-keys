@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "USBHost_t36.h"
 #include "lock_key.hpp"
+#include "usb_key_buffer.hpp"
 
 /** 
  * On the C128D hardware keyboard the Caps Lock, and 40/80 keys are physically
@@ -20,6 +21,8 @@
  */ 
 extern LockKey c128d_caps_lock;
 extern LockKey c128d_40_80;
+
+extern USBKeyBuffer key_buffer;
 
 void initialize_keyboard_output_pins(); 
 void update_output_pins(KeyboardController keyboard_controller);

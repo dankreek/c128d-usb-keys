@@ -21,7 +21,7 @@ void on_raw_press(uint8_t keycode) {
 		c128d_40_80.toggle_on_state();
 	}
 	else {
-		add_keycode_to_buffer(keycode);
+		key_buffer.add(keycode);
 	}
 }
 
@@ -31,7 +31,7 @@ void on_raw_release(uint8_t keycode) {
 	Serial.println((int)keycode, HEX);
 
 	if ((keycode != c128d_caps_lock.usb_key_code()) && (keycode != c128d_40_80.usb_key_code())) {
-		remove_keycode_from_buffer(keycode);
+		key_buffer.remove(keycode);
 	}
 }
 
@@ -42,7 +42,6 @@ void setup() {
 	Serial.begin(115200);
 
 	// Initialize data structures
-	initialize_usb_key_buffer();
 	initialize_lock_key_state();
 	initialize_keyboard_output_pins();
 
