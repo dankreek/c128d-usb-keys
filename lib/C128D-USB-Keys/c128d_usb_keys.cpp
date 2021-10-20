@@ -2,10 +2,12 @@
 #include "USBHost_t36.h"
 #include "c128d_usb_keys.hpp"
 #include "lock_key.hpp"
+#include "key_mapping.hpp"
 
 #define C128_KEY_CAPSLOCK_TOGGLE USB_KEY_F4
 #define C128_KEY_4080_TOGGLE     USB_KEY_F7
 
+uint8_t usb_key_buffer[KEY_BUFFER_SIZE];
 
 LockKey c128d_caps_lock(0, USB_KEY_F4);
 LockKey c128d_40_80(0, USB_KEY_F7);

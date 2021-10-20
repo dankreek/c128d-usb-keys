@@ -1,6 +1,7 @@
 /** ${header_comment} */
 
-#include "c128d_usb_keys.hpp"
+#include "key_mapping.hpp"
+#include "output_pins.hpp"
 
 ${output_pins}
 
@@ -11,4 +12,3 @@ ${numlock_off_key_mapping}
 PinState* pins_state[OUTPUT_PINS_COUNT] = {
 ${pins_set_array}};
 
-uint8_t usb_key_buffer[KEY_BUFFER_SIZE];
