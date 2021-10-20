@@ -2,6 +2,8 @@
 
 #include "usb_key_buffer.hpp"
 #include "key_mapping.hpp"
+#include "test_common.hpp"
+
 
 USBKeyBuffer* key_buffer;
 
@@ -93,7 +95,7 @@ void test_overflowing_buffer_drops_keys() {
 }
 
 
-void process() {
+void run_usb_keyboard_buffer_tests() {
     UNITY_BEGIN();
 
     key_buffer = new USBKeyBuffer;
@@ -110,31 +112,3 @@ void process() {
 
     UNITY_END();
 }
-
-#ifdef ARDUINO
-#include <Arduino.h>
-
-void setup() {
-    // NOTE!!! Wait for >2 secs
-    // if board doesn't support software reset via Serial.DTR/RTS
-    // TODO: See if this actually needs to happen on Teensy
-    delay(2000);
-    process();
-}
-
-void loop() {
-    // Flash LED to indicate tests are done
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(100);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(500);
-}
-
-#else
-
-int main(int argc, char **argv) {
-    process();
-    return 0;
-}
-
-#endif
