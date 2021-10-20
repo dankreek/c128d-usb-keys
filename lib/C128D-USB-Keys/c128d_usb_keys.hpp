@@ -5,13 +5,6 @@
 #include "USBHost_t36.h"
 #include "lock_key.hpp"
 
-// The number concurrently pressed keys that can be stored at one time
-#define KEY_BUFFER_SIZE 16
-
-// Sparse array containing all currently pressed keys. A 0x00 indicates an unused index.
-extern uint8_t usb_key_buffer[KEY_BUFFER_SIZE];
-
-
 /** 
  * On the C128D hardware keyboard the Caps Lock, and 40/80 keys are physically
  * locked by hardware. This USB keyboard adapter emulates that behavior by 
@@ -28,10 +21,7 @@ extern uint8_t usb_key_buffer[KEY_BUFFER_SIZE];
 extern LockKey c128d_caps_lock;
 extern LockKey c128d_40_80;
 
-void initialize_usb_key_buffer();
 void initialize_keyboard_output_pins(); 
-void add_keycode_to_buffer(uint8_t key_code);
-void remove_keycode_from_buffer(uint8_t key_code);
 void update_output_pins(KeyboardController keyboard_controller);
 void initialize_lock_key_state();
 

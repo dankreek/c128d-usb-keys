@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "USBHost_t36.h"
 #include "c128d_usb_keys.hpp"
+#include "usb_key_buffer.hpp"
 
 
 USBHost usb_host;

@@ -3,11 +3,12 @@
 #include "c128d_usb_keys.hpp"
 #include "lock_key.hpp"
 #include "key_mapping.hpp"
+#include "usb_key_buffer.hpp"
+
 
 #define C128_KEY_CAPSLOCK_TOGGLE USB_KEY_F4
 #define C128_KEY_4080_TOGGLE     USB_KEY_F7
 
-uint8_t usb_key_buffer[KEY_BUFFER_SIZE];
 
 LockKey c128d_caps_lock(0, USB_KEY_F4);
 LockKey c128d_40_80(0, USB_KEY_F7);
@@ -17,17 +18,6 @@ void initialize_lock_key_state() {
     // TODO: load state from EEPROM and set accordingly
     c128d_caps_lock.set_is_on(false);
     c128d_40_80.set_is_on(false);
-}
-
-/**
- * Clear out the USB keyboard buffer, which is a sparse array that contains
- * all keys currently pressed on the keyboard. A value of 0 indicates that no
- * key is pressed.
- */
-void initialize_usb_key_buffer() {
-    for (int i=0; i < KEY_BUFFER_SIZE; i++) {
-        usb_key_buffer[0] = 0;
-    }
 }
 
 /**
@@ -48,25 +38,6 @@ void initialize_keyboard_output_pins() {
 
 }
 
-
-void add_keycode_to_buffer(uint8_t key_code) {
-    for (int i=0; i < KEY_BUFFER_SIZE; i++) {
-        if (usb_key_buffer[i] != 0) {
-            usb_key_buffer[i] = key_code;
-            return;
-        }
-    }
-}
-
-
-void remove_keycode_from_buffer(uint8_t key_code) {
-    for (int i=0; i < KEY_BUFFER_SIZE; i++) {
-        if (usb_key_buffer[i] == key_code) {
-            usb_key_buffer[i] = 0;
-            return;
-        }
-    }
-}
 
 void _set_output_key(KeyInfo key_info) {
     if (key_info.is_sent) {
