@@ -8,9 +8,10 @@ void setup() {
     // NOTE!!! Wait for >2 secs
     // if board doesn't support software reset via Serial.DTR/RTS
     // TODO: See if this actually needs to happen on Teensy
-    delay(2000);
+    // delay(2000);
     run_usb_keyboard_buffer_tests();
     run_lock_key_tests();
+    run_usb_c128d_tests();
 }
 
 void loop() {
@@ -26,6 +27,7 @@ void loop() {
 int main(int argc, char **argv) {
     run_usb_keyboard_buffer_tests();
     run_lock_key_tests();
+    run_usb_c128d_tests();
     return 0;
 }
 
