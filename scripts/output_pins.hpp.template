@@ -1,8 +1,0 @@
-/** ${header_comment} */
-#ifndef OUTPUT_PINS_HPP
-#define OUTPUT_PINS_HPP
-
-// Teensy 3.6 digital output pin numbers for the C128d keyboard matrix
-${teensy36_output_pins}
-
-#endif

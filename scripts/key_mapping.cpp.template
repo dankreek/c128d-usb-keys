@@ -3,12 +3,12 @@
 #include "key_mapping.hpp"
 #include "output_pins.hpp"
 
-${output_pins}
+PinsState output_pins_state;
 
 KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1] = {
 ${usb_key_mapping}};
 
 ${numlock_off_key_mapping}
-PinState* pins_state[OUTPUT_PINS_COUNT] = {
+bool* pins_state[OUTPUT_PINS_COUNT] = {
 ${pins_set_array}};
 

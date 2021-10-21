@@ -4,27 +4,53 @@
 
 #include <stdint.h>
 
-// Represents the state of an output pin, which is calculated on every pass of the main loop
-struct PinState {
-    bool is_set;      // Is this pin set to GRD for output
-    uint8_t pin_num;  // Teensy3.6 output pin number
+/**
+ * Represents the state of all output pins, true meaning set LOW, false meaning disconnected
+ */
+struct PinsState {
+    bool row0;       
+    bool row1;       
+    bool row2;       
+    bool row3;       
+    bool row4;       
+    bool row5;       
+    bool row6;       
+    bool row7;       
+    bool restore;    
+    bool forty_eighty;
+    bool caps_lock;
+    bool col0;       
+    bool col1;       
+    bool col2;       
+    bool col3;       
+    bool col4;       
+    bool col5;       
+    bool col6;       
+    bool col7;       
+    bool k0;         
+    bool k1;         
+    bool k2;         
+    bool restore0;
 };
 
 #define OUTPUT_PINS_COUNT 23
 
+// An instance of PinsState for the key mapping 
+extern PinsState output_pins_state;
+
 /**
- * An array of all PinState's which represent the calculated state of all 
- * output pins. This is main for conveniently reseting the buffered state of 
- * every output pin before the new states are calculated from usb_key_buffer.
+ * An array of all output pin states which represent the calculated state of all 
+ * output pins. This is mainly for conveniently reseting the buffered state of 
+ * every output pin before the new states are calculated.
  */
-extern PinState* pins_state[OUTPUT_PINS_COUNT];
+extern bool* pins_state[OUTPUT_PINS_COUNT];
 
 
 // Describes a mapping of a USB keyboard key to the keyboard matrix on a C128D.
 struct KeyInfo {
-    bool is_sent;  // Is this USB key sent to the C128d?
-    PinState *row_pin;
-    PinState *col_pin;
+    bool is_sent;
+    bool *row_pin;
+    bool *col_pin;
 };
 
 // The highest USB key code that will be used

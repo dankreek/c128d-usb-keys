@@ -9,8 +9,8 @@
 
 USBKeyBuffer key_buffer;
 
-LockKey c128d_caps_lock(0, USB_KEY_F4);
-LockKey c128d_40_80(0, USB_KEY_F7);
+LockKey c128d_caps_lock(USB_KEY_F4);
+LockKey c128d_40_80(USB_KEY_F7);
 
 
 void initialize_lock_key_state() {
@@ -25,14 +25,14 @@ void initialize_lock_key_state() {
  */
 void initialize_keyboard_output_pins() {
     for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
-        pins_state[i]->is_set = false;
+        *(pins_state[i]) = false;
 
         // Set output to digital low to be safe. This probably isn't necessary.
-        pinMode(pins_state[i]->pin_num, OUTPUT);
-        digitalWrite(pins_state[i]->pin_num, LOW);
+        // pinMode(pins_state[i]->pin_num, OUTPUT);
+        // digitalWrite(pins_state[i]->pin_num, LOW);
 
         // Set pin to input mode to make it appear disconnected to the C128d
-        pinMode(pins_state[i]->pin_num, INPUT);
+        // pinMode(pins_state[i]->pin_num, INPUT);
     }
 
 }
@@ -40,27 +40,27 @@ void initialize_keyboard_output_pins() {
 
 void _set_output_key(KeyInfo key_info) {
     if (key_info.is_sent) {
-        key_info.col_pin->is_set = true;
-        key_info.row_pin->is_set = true;
+        *key_info.col_pin = true;
+        *key_info.row_pin = true;
     }
 }
 
 
 void _reset_keyboard_output_pins_state() {
     for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
-        pins_state[i]->is_set = false;
+        *(pins_state[i]) = false;
     }
 }
 
 
 void _apply_keyboard_output_pins_state() {
     for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
-        if (pins_state[i]->is_set) {
-            pinMode(pins_state[i]->pin_num, OUTPUT);
-            digitalWrite(pins_state[i]->pin_num, LOW);
+        if (*(pins_state[i])) {
+            // pinMode(pins_state[i]->pin_num, OUTPUT);
+            // digitalWrite(pins_state[i]->pin_num, LOW);
         } 
         else {
-            pinMode(pins_state[i]->pin_num, INPUT);
+            // pinMode(pins_state[i]->pin_num, INPUT);
         }
     }
 }
