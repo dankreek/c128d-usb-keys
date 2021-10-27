@@ -49,13 +49,13 @@ void set_led(uint8_t led_pin, bool is_lit) {
 
 
 void capslock_lock_key_cb(bool is_locked) {
-	set_led(CAPSLOCK_LOCK_LED, !is_locked);
+	set_led(CAPSLOCK_LOCK_LED, is_locked);
 	// XXX: store lock key state in EEPROM
 }
 
 
 void forty_eighty_lock_key_cb(bool is_locked) {
-	set_led(FORTY_EIGHTY_LOCK_LED, !is_locked);
+	set_led(FORTY_EIGHTY_LOCK_LED, is_locked);
 	// XXX: store lock key state in EEPROM
 }
 
@@ -137,4 +137,3 @@ void loop() {
 
 	update_output_pin(output_pins_state->restore0, RESTORE0_PIN);
 }
-
