@@ -1,63 +1,140 @@
 #include <Arduino.h>
 #include "USBHost_t36.h"
 #include "usb_c128d.hpp"
+#include "output_pins.hpp"
 
+// How "bright" a lock key's indicator is. 
+const uint8_t led_brightness = 120;
 
+// Add a USB host, support two hubs and use the first keyboard found
 USBHost usb_host;
 USBHub hub1(usb_host);
 USBHub hub2(usb_host);
 KeyboardController keyboard(usb_host);
 
+// Object which contains the "state machine" for the USB->128D keybaord adapter
+USB_C128D usb_c128d;
 
-void on_raw_press(uint8_t keycode) {
+// An array of all keyboard output pins, used for convenienty initialization
+uint8_t all_keyboard_pins[] = {
+	ROW0_PIN, ROW1_PIN, ROW2_PIN, ROW3_PIN, ROW4_PIN, ROW5_PIN, ROW6_PIN, ROW7_PIN,
+	RESTORE_PIN, FORTY_EIGHTY_PIN, CAPS_LOCK_PIN,
+	COL0_PIN, COL1_PIN, COL2_PIN, COL3_PIN, COL4_PIN, COL5_PIN, COL6_PIN, COL7_PIN,
+	K0_PIN, K1_PIN, K2_PIN,
+	RESTORE0_PIN
+};
+
+
+// KeyboardController callback to handle key pressed
+void on_raw_press(uint8_t key_code) {
 	Serial.print("raw key press: 0x");
-	Serial.println((int)keycode, HEX);
-
-	// if (keycode == c128d_caps_lock.usb_key_code()) {
-	// 	c128d_caps_lock.toggle_on_state();
-	// }
-	// else if (keycode == c128d_40_80.usb_key_code()) {
-	// 	c128d_40_80.toggle_on_state();
-	// }
-	// else {
-	// 	key_buffer.add(keycode);
-	// }
+	Serial.println((int)key_code, HEX);
+	usb_c128d.usb_key_down(key_code);
 }
 
 
-void on_raw_release(uint8_t keycode) {
+// KeyboardController callback to handle key releases
+void on_raw_release(uint8_t key_code) {
 	Serial.print("raw key release: 0x");
-	Serial.println((int)keycode, HEX);
+	Serial.println((int)key_code, HEX);
+	usb_c128d.usb_key_up(key_code);
+}
 
-	// if ((keycode != c128d_caps_lock.usb_key_code()) && (keycode != c128d_40_80.usb_key_code())) {
-	// 	key_buffer.remove(keycode);
-	// }
+
+// Set an LED connected to a PWM pin to be either off or set to a defined brightness
+void set_led(uint8_t led_pin, bool is_lit) {
+	uint8_t value = is_lit ? led_brightness : 0;
+	analogWrite(led_pin, value);
+}
+
+
+void capslock_lock_key_cb(bool is_locked) {
+	set_led(CAPSLOCK_LOCK_LED, !is_locked);
+	// XXX: store lock key state in EEPROM
+}
+
+
+void forty_eighty_lock_key_cb(bool is_locked) {
+	set_led(FORTY_EIGHTY_LOCK_LED, !is_locked);
+	// XXX: store lock key state in EEPROM
+}
+
+
+/**
+ * Set the C128D keyboard output pin to either GND or NC (no connection)
+ * 
+ * @param pin_num - Teensy3.6 output pin number 
+ * @param is_gnd - Is this pin set to GND (output LOW) or NC (INPUT)?
+ */
+void update_output_pin(uint8_t pin_num, bool is_gnd) {
+	if (is_gnd) {
+		pinMode(pin_num, OUTPUT);
+	} else {
+		pinMode(pin_num, INPUT);
+	}
 }
 
 
 void setup() {
 	// Setup debugging output
-	// while (!Serial) ; 
 	Serial.begin(115200);
-	pinMode(13, OUTPUT);
+
+	// Setup all output pins 
+	for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
+		// INPUT signals there is no connection
+		pinMode(all_keyboard_pins[i], INPUT);
+    }
+
+	// Setup LED output pins
+	pinMode(FORTY_EIGHTY_LOCK_LED, OUTPUT);
+	pinMode(CAPSLOCK_LOCK_LED, OUTPUT);
+
+	// XXX: restore lock key states from EEPROM
+	usb_c128d.c128_capslock_lock_key.set_toggle_callback(capslock_lock_key_cb);
+	usb_c128d.c128_4080_lock_key.set_toggle_callback(forty_eighty_lock_key_cb);
+
 	// Setup USB Host and listen to the first keyboard found
-	// usb_host.begin();
-	// keyboard.attachRawPress(on_raw_press);
-	// keyboard.attachRawRelease(on_raw_release);
+	usb_host.begin();
+	keyboard.attachRawPress(on_raw_press);
+	keyboard.attachRawRelease(on_raw_release);
 }
 
 
 void loop() {
-	// Poll the USB keyboard and update the USB key buffer
-	// usb_host.Task();
+	// Poll the USB keyboard and send all key up/key down events
+	usb_host.Task();
 
-    // Flash LED to indicate tests are done
-    digitalWrite(13, HIGH);
-    delay(100);
-    digitalWrite(13, LOW);
-    delay(500);
-	// Once the USB keyboard buffer has been updated, derive output state from it
+	PinsState* output_pins_state = usb_c128d.get_output_pins(
+		keyboard.capsLock(),
+		keyboard.numLock()
+	);
 
-	Serial.write("Piss and poop\n");
+	update_output_pin(output_pins_state->row0, ROW0_PIN);
+	update_output_pin(output_pins_state->row1, ROW1_PIN);
+	update_output_pin(output_pins_state->row2, ROW2_PIN);
+	update_output_pin(output_pins_state->row3, ROW3_PIN);
+	update_output_pin(output_pins_state->row4, ROW4_PIN);
+	update_output_pin(output_pins_state->row5, ROW5_PIN);
+	update_output_pin(output_pins_state->row6, ROW6_PIN);
+	update_output_pin(output_pins_state->row7, ROW7_PIN);
+
+	update_output_pin(output_pins_state->restore, RESTORE_PIN);
+	update_output_pin(output_pins_state->forty_eighty, FORTY_EIGHTY_PIN);
+	update_output_pin(output_pins_state->caps_lock, CAPS_LOCK_PIN);
+
+	update_output_pin(output_pins_state->col0, COL0_PIN);
+	update_output_pin(output_pins_state->col1, COL1_PIN);
+	update_output_pin(output_pins_state->col2, COL2_PIN);
+	update_output_pin(output_pins_state->col3, COL3_PIN);
+	update_output_pin(output_pins_state->col4, COL4_PIN);
+	update_output_pin(output_pins_state->col5, COL5_PIN);
+	update_output_pin(output_pins_state->col6, COL6_PIN);
+	update_output_pin(output_pins_state->col7, COL7_PIN);
+
+	update_output_pin(output_pins_state->k0, K0_PIN);
+	update_output_pin(output_pins_state->k1, K1_PIN);
+	update_output_pin(output_pins_state->k2, K2_PIN);
+
+	update_output_pin(output_pins_state->restore0, RESTORE0_PIN);
 }
 
