@@ -1,10 +1,16 @@
 #include <Arduino.h>
-#include "USBHost_t36.h"
-#include "usb_c128d.hpp"
+#include <USBHost_t36.h>
+#include <eeprom_funcs.hpp>
+#include <usb_c128d.hpp>
 #include "output_pins.hpp"
 
 // How "bright" a lock key's indicator is. 
 const uint8_t led_brightness = 120;
+
+// Addressed in EEPROM where the state of the C128d's Capslock and 40/80 keys
+const int capslock_state_eeprom_addr = 0;
+const int forty_eighty_lock_state_eeprom_addr = 1;
+
 
 // Add a USB host, support two hubs and use the first keyboard found
 USBHost usb_host;
@@ -49,14 +55,61 @@ void set_led(uint8_t led_pin, bool is_lit) {
 
 
 void capslock_lock_key_cb(bool is_locked) {
+	Serial.print("C128D Capslock ");
+	if (is_locked) Serial.println("ON"); else Serial.println("OFF");
+
 	set_led(CAPSLOCK_LOCK_LED, is_locked);
-	// XXX: store lock key state in EEPROM
+
+	// store lock key state in EEPROM to be restored on reset
+	write_eeprom_bool(capslock_state_eeprom_addr, is_locked);
 }
 
 
 void forty_eighty_lock_key_cb(bool is_locked) {
+	Serial.print("C128D 40/80 lock ");
+	if (is_locked) Serial.println("ON"); else Serial.println("OFF");
+
 	set_led(FORTY_EIGHTY_LOCK_LED, is_locked);
-	// XXX: store lock key state in EEPROM
+
+	// store lock key state in EEPROM to be restored on reset
+	write_eeprom_bool(forty_eighty_lock_state_eeprom_addr, is_locked);
+}
+
+
+// Read the previous states of the soft-lock keys from EEPROM and set them
+void restore_lock_key_states() {
+	bool capslock_state = read_eeprom_bool(capslock_state_eeprom_addr);
+	usb_c128d.c128_capslock_lock_key.set_is_on(capslock_state);
+
+	bool forty_eighty_state = read_eeprom_bool(forty_eighty_lock_state_eeprom_addr);
+	usb_c128d.c128_4080_lock_key.set_is_on(forty_eighty_state);
+}
+
+
+void setup() {
+	// Setup debugging output
+	Serial.begin(115200);
+
+	// Setup all output pins 
+	for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
+		// INPUT signals there is no connection
+		pinMode(all_keyboard_pins[i], INPUT);
+    }
+
+	// Setup LED pins
+	pinMode(FORTY_EIGHTY_LOCK_LED, OUTPUT);
+	pinMode(CAPSLOCK_LOCK_LED, OUTPUT);
+
+	// restore lock key states from EEPROM
+	restore_lock_key_states();
+
+	usb_c128d.c128_capslock_lock_key.set_toggle_callback(capslock_lock_key_cb);
+	usb_c128d.c128_4080_lock_key.set_toggle_callback(forty_eighty_lock_key_cb);
+
+	// Setup USB Host and listen to the first keyboard found
+	usb_host.begin();
+	keyboard.attachRawPress(on_raw_press);
+	keyboard.attachRawRelease(on_raw_release);
 }
 
 
@@ -72,31 +125,6 @@ void update_output_pin(uint8_t pin_num, bool is_gnd) {
 	} else {
 		pinMode(pin_num, INPUT);
 	}
-}
-
-
-void setup() {
-	// Setup debugging output
-	Serial.begin(115200);
-
-	// Setup all output pins 
-	for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
-		// INPUT signals there is no connection
-		pinMode(all_keyboard_pins[i], INPUT);
-    }
-
-	// Setup LED output pins
-	pinMode(FORTY_EIGHTY_LOCK_LED, OUTPUT);
-	pinMode(CAPSLOCK_LOCK_LED, OUTPUT);
-
-	// XXX: restore lock key states from EEPROM
-	usb_c128d.c128_capslock_lock_key.set_toggle_callback(capslock_lock_key_cb);
-	usb_c128d.c128_4080_lock_key.set_toggle_callback(forty_eighty_lock_key_cb);
-
-	// Setup USB Host and listen to the first keyboard found
-	usb_host.begin();
-	keyboard.attachRawPress(on_raw_press);
-	keyboard.attachRawRelease(on_raw_release);
 }
 
 

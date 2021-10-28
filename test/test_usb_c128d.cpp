@@ -245,7 +245,6 @@ void test_cursor_keys() {
 
 
 void run_usb_c128d_tests() {
-    UNITY_BEGIN();
     RUN_TEST(test_no_keys_pressed);
     RUN_TEST(test_single_key_press);
     RUN_TEST(test_key_down_and_key_up);
@@ -253,5 +252,4 @@ void run_usb_c128d_tests() {
     RUN_TEST(test_usb_numlock);
     RUN_TEST(test_4080_lock_key);
     RUN_TEST(test_cursor_keys);
-    UNITY_END();
 }

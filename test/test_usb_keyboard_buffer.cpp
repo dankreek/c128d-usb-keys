@@ -2,7 +2,6 @@
 
 #include "usb_key_buffer.hpp"
 #include "key_mapping.hpp"
-#include "test_common.hpp"
 
 
 USBKeyBuffer* key_buffer;
@@ -96,8 +95,6 @@ void test_overflowing_buffer_drops_keys() {
 
 
 void run_usb_keyboard_buffer_tests() {
-    UNITY_BEGIN();
-
     key_buffer = new USBKeyBuffer;
     RUN_TEST(test_add_key);
     RUN_TEST(test_remove_key);
@@ -109,6 +106,4 @@ void run_usb_keyboard_buffer_tests() {
     key_buffer = new USBKeyBuffer;
     RUN_TEST(test_overflowing_buffer_drops_keys);
     delete key_buffer;
-
-    UNITY_END();
 }

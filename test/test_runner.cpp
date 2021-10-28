@@ -1,5 +1,5 @@
-#include "test_common.hpp"
-
+#include <unity.h>
+#include "test_runner.hpp"
 
 #ifdef ARDUINO
 #include <Arduino.h>
@@ -13,11 +13,13 @@ extern "C"{
 void setup() {
     // NOTE!!! Wait for >2 secs
     // if board doesn't support software reset via Serial.DTR/RTS
-    // TODO: See if this actually needs to happen on Teensy
-    delay(2000);
+    delay(500);
+    UNITY_BEGIN();
     run_usb_keyboard_buffer_tests();
     run_lock_key_tests();
     run_usb_c128d_tests();
+    run_eeprom_bool_tests();
+    UNITY_END();
 }
 
 void loop() {
@@ -32,9 +34,18 @@ void loop() {
 #else
 
 int main(int argc, char **argv) {
+    UNITY_BEGIN();
     run_usb_keyboard_buffer_tests();
+    UNITY_END();
+
+    UNITY_BEGIN();
     run_lock_key_tests();
+    UNITY_END();
+
+    UNITY_BEGIN();
     run_usb_c128d_tests();
+    UNITY_END();
+
     return 0;
 }
 

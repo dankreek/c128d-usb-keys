@@ -84,12 +84,10 @@ void test_callback_not_called_on_same_state() {
 
 
 void run_lock_key_tests() {
-    UNITY_BEGIN();
     RUN_TEST(test_set_is_on);
     RUN_TEST(test_toggle_on_state);
     RUN_TEST(test_set_toggle_callback);
     RUN_TEST(test_callback_called_on_toggle);
     RUN_TEST(test_callback_called_on_set);
     RUN_TEST(test_callback_not_called_on_same_state);
-    UNITY_END();
 }
