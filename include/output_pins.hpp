@@ -24,7 +24,6 @@ const uint8_t  COL7_PIN         = 7;
 const uint8_t  K0_PIN           = 8;
 const uint8_t  K1_PIN           = 9;
 const uint8_t  K2_PIN           = 10;
-const uint8_t  RESTORE0_PIN     = 13;
 
 const uint8_t FORTY_EIGHTY_LOCK_LED = 37;
 const uint8_t CAPSLOCK_LOCK_LED = 36;

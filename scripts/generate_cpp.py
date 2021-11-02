@@ -22,9 +22,6 @@ class Matrix(Enum):
     row5 = 17
     row6 = 16
     row7 = 19
-    restore = 14
-    forty_eighty = 11
-    caps_lock = 12
 
     col0 = 23
     col1 = 6
@@ -37,7 +34,10 @@ class Matrix(Enum):
     k0 = 8
     k1 = 9
     k2 = 10
-    restore0 = 13  # Labled as 0
+
+    restore = 14
+    forty_eighty = 11
+    caps_lock = 12
 
 
 class KeyInfo(NamedTuple):
@@ -112,10 +112,10 @@ key_codes: Dict[int, KeyInfo] = {
     0x3a: KeyInfo('F1',  'ESC',       (Matrix.row0, Matrix.k1)),
     0x3b: KeyInfo('F2',  'TAB',       (Matrix.row3, Matrix.k0)),
     0x3c: KeyInfo('F3',  'ALT',       (Matrix.row0, Matrix.k2)),
-    0x3d: KeyInfo('F4',  'CAPS_LOCK', (Matrix.caps_lock, Matrix.restore0)),
+    0x3d: KeyInfo('F4',  'CAPS_LOCK', (Matrix.caps_lock, None)),
     0x3e: KeyInfo('F5',  'HELP',      (Matrix.row0, Matrix.k0)),
     0x3f: KeyInfo('F6',  'LINE_FEED', (Matrix.row3, Matrix.k1)),
-    0x40: KeyInfo('F7',  '40/80',     (Matrix.forty_eighty, Matrix.restore0)),
+    0x40: KeyInfo('F7',  '40/80',     (Matrix.forty_eighty, None)),
     0x41: KeyInfo('F8',  'NO_SCROLL', (Matrix.row7, Matrix.k2)),
     0x42: KeyInfo('F9',  'F1',        (Matrix.row4, Matrix.col0)),
     0x43: KeyInfo('F10', 'F3',        (Matrix.row5, Matrix.col0)),
@@ -124,7 +124,7 @@ key_codes: Dict[int, KeyInfo] = {
 
     0x49: KeyInfo('INSERT', '£',        (Matrix.row0, Matrix.col6)),
     0x4a: KeyInfo('HOME',   'CLR/HOME', (Matrix.row3, Matrix.col6)),
-    0x4b: KeyInfo('PGUP',   'RESTORE',  (Matrix.restore, Matrix.restore0)),
+    0x4b: KeyInfo('PGUP',   'RESTORE',  (Matrix.restore, None)),
     0x4c: KeyInfo('DELETE', '↑',        (Matrix.row6, Matrix.col6)),
 
     0x4f: KeyInfo('RIGHT', 'CURS_RL',  (Matrix.row2, Matrix.col0)),
@@ -203,7 +203,9 @@ def main(args: List[str]) -> int:
         usb_key_mapping += '    /* 0x{0:02x} */  '.format(key_code_num)
         if key_code_num in key_codes and key_codes[key_code_num].matrix:
             key_info = key_codes[key_code_num]
-            mapping = f'{{true, &output_pins_state.{key_info.matrix[0].name}, &output_pins_state.{key_info.matrix[1].name}}},'
+            output_row_name = f'&output_pins_state.{key_info.matrix[0].name}'
+            output_pin_name = f'&output_pins_state.{key_info.matrix[1].name}' if key_info.matrix[1] else 'nullptr'
+            mapping = f'{{true, {output_row_name}, {output_pin_name}}},'
 
             usb_key_mapping += '{0:32} // {1} => {2}\n'.format(mapping, usb_key_name(key_info.name), key_info.c128_name)
         else:

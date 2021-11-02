@@ -1,7 +1,6 @@
 /** ${header_comment} */
 
 #include "key_mapping.hpp"
-#include "output_pins.hpp"
 
 PinsState output_pins_state;
 

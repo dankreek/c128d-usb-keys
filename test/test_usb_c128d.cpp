@@ -3,34 +3,30 @@
 
 PinsState right_shift = {
     false, false, false, false, true, false, false, false,
-    false, false, false,
     false, false, false, false, false, false, true, false,
     false, false, false,
-    false 
+    false, false, false,
 };
 
 PinsState no_pins = {
     false, false, false, false, false, false, false, false,
-    false, false, false,
     false, false, false, false, false, false, false, false,
     false, false, false,
-    false 
+    false, false, false,
 };
 
 PinsState a_pins = {
     false, true, false, false, false, false, false, false,
-    false, false, false,
     false, false, true, false, false, false, false, false,
     false, false, false,
-    false 
+    false, false, false,
 };
 
 PinsState b_pins = {
     false, false, false, false, true, false, false, false,
-    false, false, false,
     false, false, false, true, false, false, false, false,
     false, false, false,
-    false 
+    false, false, false,
 };
 
 void _combine_pins(PinsState& a, PinsState& b, PinsState& output) {
@@ -59,8 +55,6 @@ void _combine_pins(PinsState& a, PinsState& b, PinsState& output) {
     output.k0 = a.k0 | b.k0;
     output.k1 = a.k1 | b.k1;
     output.k2 = a.k2 | b.k2;
-
-    output.restore0 = a.restore0 | b.restore0;
 }
 
 
@@ -113,10 +107,9 @@ void test_usb_capslock_on() {
     PinsState* state = usb_c128d.get_output_pins(true, false);
     PinsState expected_left_shift = {
         false, false, false, false, false, false, false, true,
-        false, false, false,
         false, true, false, false, false, false, false, false,
         false, false, false,
-        false 
+        false, false, false,
     };
 
     TEST_ASSERT_EQUAL_MEMORY(&expected_left_shift, state, sizeof(PinsState));
@@ -129,10 +122,9 @@ void test_usb_numlock() {
     PinsState* state = usb_c128d.get_output_pins(false, true);
     PinsState expected_kp_4 = {
         false, false, false, false, false, true, false, false,
-        false, false, false,
         false, false, false, false, false, false, false, false,
         true, false, false,
-        false 
+        false, false, false,
     };
 
     TEST_ASSERT_EQUAL_MEMORY(&expected_kp_4, state, sizeof(PinsState));
@@ -140,10 +132,9 @@ void test_usb_numlock() {
     state = usb_c128d.get_output_pins(false, false);
     PinsState expected_top_cursor_left = {
         false, false, false, false, false, true, false, false,
-        false, false, false,
         false, false, false, false, false, false, false, false,
         false, false, true,
-        false 
+        false, false, false,
     };
 
     TEST_ASSERT_EQUAL_MEMORY(&expected_top_cursor_left, state, sizeof(PinsState));
@@ -153,10 +144,9 @@ void test_4080_lock_key() {
     USB_C128D usb_c128d;
     PinsState expected_4080_lock = {
         false, false, false, false, false, false, false, false,
-        false, true, false,
         false, false, false, false, false, false, false, false,
         false, false, false,
-        true 
+        false, true, false,
     };
 
     usb_c128d.usb_key_down(usb_c128d.c128_4080_lock_key.usb_key_code());
@@ -192,18 +182,16 @@ void test_cursor_keys() {
     USB_C128D usb_c128d;
     PinsState expected_cursor_right = {
         false, false, true, false, false, false, false, false,
-        false, false, false,
         true, false, false, false, false, false, false, false,
         false, false, false,
-        false 
+        false, false, false,
     };
 
     PinsState expected_cursor_down = {
         false, false, false, false, false, false, false, true,
-        false, false, false,
         true, false, false, false, false, false, false, false,
         false, false, false,
-        false 
+        false, false, false,
     };
 
     usb_c128d.usb_key_down(USB_KEY_RIGHT);

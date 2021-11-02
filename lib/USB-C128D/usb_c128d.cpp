@@ -33,8 +33,11 @@ bool USB_C128D::_is_keypad_key(uint8_t key_code) {
 
 void USB_C128D::_set_output_key(KeyInfo key_info) {
     if (key_info.is_sent) {
-        *key_info.col_pin = true;
         *key_info.row_pin = true;
+
+        if (key_info.col_pin != nullptr) {
+            *key_info.col_pin = true;
+        }
     }
 }
 

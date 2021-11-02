@@ -16,9 +16,7 @@ struct PinsState {
     bool row5;       
     bool row6;       
     bool row7;       
-    bool restore;    
-    bool forty_eighty;
-    bool caps_lock;
+    
     bool col0;       
     bool col1;       
     bool col2;       
@@ -30,10 +28,13 @@ struct PinsState {
     bool k0;         
     bool k1;         
     bool k2;         
-    bool restore0;
+
+    bool restore;    
+    bool forty_eighty;
+    bool caps_lock;
 };
 
-#define OUTPUT_PINS_COUNT 23
+#define OUTPUT_PINS_COUNT 22
 
 // An instance of PinsState for the key mapping 
 extern PinsState output_pins_state;

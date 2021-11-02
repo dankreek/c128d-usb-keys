@@ -66,10 +66,10 @@ KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1] = {
     /* 0x3a */  {true, &output_pins_state.row0, &output_pins_state.k1}, // USB_KEY_F1 => ESC
     /* 0x3b */  {true, &output_pins_state.row3, &output_pins_state.k0}, // USB_KEY_F2 => TAB
     /* 0x3c */  {true, &output_pins_state.row0, &output_pins_state.k2}, // USB_KEY_F3 => ALT
-    /* 0x3d */  {true, &output_pins_state.caps_lock, &output_pins_state.restore0}, // USB_KEY_F4 => CAPS_LOCK
+    /* 0x3d */  {true, &output_pins_state.caps_lock, nullptr}, // USB_KEY_F4 => CAPS_LOCK
     /* 0x3e */  {true, &output_pins_state.row0, &output_pins_state.k0}, // USB_KEY_F5 => HELP
     /* 0x3f */  {true, &output_pins_state.row3, &output_pins_state.k1}, // USB_KEY_F6 => LINE_FEED
-    /* 0x40 */  {true, &output_pins_state.forty_eighty, &output_pins_state.restore0}, // USB_KEY_F7 => 40/80
+    /* 0x40 */  {true, &output_pins_state.forty_eighty, nullptr}, // USB_KEY_F7 => 40/80
     /* 0x41 */  {true, &output_pins_state.row7, &output_pins_state.k2}, // USB_KEY_F8 => NO_SCROLL
     /* 0x42 */  {true, &output_pins_state.row4, &output_pins_state.col0}, // USB_KEY_F9 => F1
     /* 0x43 */  {true, &output_pins_state.row5, &output_pins_state.col0}, // USB_KEY_F10 => F3
@@ -80,7 +80,7 @@ KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1] = {
     /* 0x48 */  {false, nullptr, nullptr},
     /* 0x49 */  {true, &output_pins_state.row0, &output_pins_state.col6}, // USB_KEY_INSERT => £
     /* 0x4a */  {true, &output_pins_state.row3, &output_pins_state.col6}, // USB_KEY_HOME => CLR/HOME
-    /* 0x4b */  {true, &output_pins_state.restore, &output_pins_state.restore0}, // USB_KEY_PGUP => RESTORE
+    /* 0x4b */  {true, &output_pins_state.restore, nullptr}, // USB_KEY_PGUP => RESTORE
     /* 0x4c */  {true, &output_pins_state.row6, &output_pins_state.col6}, // USB_KEY_DELETE => ↑
     /* 0x4d */  {false, nullptr, nullptr},
     /* 0x4e */  {false, nullptr, nullptr},
@@ -132,9 +132,6 @@ bool* pins_state[OUTPUT_PINS_COUNT] = {
     &output_pins_state.row5,
     &output_pins_state.row6,
     &output_pins_state.row7,
-    &output_pins_state.restore,
-    &output_pins_state.forty_eighty,
-    &output_pins_state.caps_lock,
     &output_pins_state.col0,
     &output_pins_state.col1,
     &output_pins_state.col2,
@@ -146,6 +143,8 @@ bool* pins_state[OUTPUT_PINS_COUNT] = {
     &output_pins_state.k0,
     &output_pins_state.k1,
     &output_pins_state.k2,
-    &output_pins_state.restore0,
+    &output_pins_state.restore,
+    &output_pins_state.forty_eighty,
+    &output_pins_state.caps_lock,
 };
 
