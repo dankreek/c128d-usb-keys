@@ -1,6 +1,18 @@
 #include "usb_c128d.hpp"
 
 
+USB_C128D::USB_C128D() {
+    // Reset all output pins to unselected and force an update
+    _reset_output_pins_state();
+}
+
+
+void USB_C128D::init() {
+    set_cols(unset_cols);
+    set_special_pins(unset_sepcial_keys);
+}
+
+
 void USB_C128D::usb_key_down(uint8_t usb_key_code) {
     // If this is one of the virtual lock keys, toggle its state
     if (usb_key_code == c128_capslock_lock_key.usb_key_code()) {
@@ -12,6 +24,7 @@ void USB_C128D::usb_key_down(uint8_t usb_key_code) {
     }
 }
 
+
 void USB_C128D::usb_key_up(uint8_t usb_key_code) {
     // If this is one of the virtual lock keys ignore it
 	if ((usb_key_code != c128_capslock_lock_key.usb_key_code()) && 
@@ -20,11 +33,26 @@ void USB_C128D::usb_key_up(uint8_t usb_key_code) {
 	}
 }
 
-void USB_C128D::_reset_pins_state() {
-    for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
-        *(pins_state[i]) = false;
+
+/**
+ * Reset all output pins for each row in the matrix back to false
+ */
+void USB_C128D::_reset_output_pins_state() {
+    for (int row_i=0; row_i < 8; row_i++) {
+        for (int col_i=0; col_i < 8; col_i++) {
+            output_pins_state.rows[row_i].cols[col_i] = false;
+        }
+
+        output_pins_state.rows[row_i].k0 = false;
+        output_pins_state.rows[row_i].k1 = false;
+        output_pins_state.rows[row_i].k2 = false;
     }
+
+    output_pins_state.special.restore = false;
+    output_pins_state.special.caps_lock = false;
+    output_pins_state.special.forty_eighty = false;
 }
+
 
 bool USB_C128D::_is_keypad_key(uint8_t key_code) {
     return ((key_code >= USB_KEY_KP_MINUS) && (key_code <= USB_KEY_KP_DOT));
@@ -32,18 +60,37 @@ bool USB_C128D::_is_keypad_key(uint8_t key_code) {
 
 
 void USB_C128D::_set_output_key(KeyInfo key_info) {
-    if (key_info.is_sent) {
-        *key_info.row_pin = true;
+    if (key_info.is_sent) *key_info.pins = true;
+}
 
-        if (key_info.col_pin != nullptr) {
-            *key_info.col_pin = true;
+
+void USB_C128D::poll_input_and_set_outputs() {
+    SelectedRow new_selected_row = selected_row();
+
+    // Only react to a state transition
+    if (new_selected_row != _cur_selected_row) {
+        // C128 is done reading keyboard state so clear the outputs and send them
+        if (new_selected_row == SelectedRow::none) {
+            set_cols(unset_cols);
         }
+        else {
+            // The C128 is now asking for the new keyboard state
+            // so, recalculate it, and set the special pins
+            if (new_selected_row == SelectedRow::row0) {
+                _calculate_output_pins_state();
+                set_special_pins(output_pins_state.special);
+            }
+
+            set_cols(output_pins_state.rows[new_selected_row]);
+        }
+
+        _cur_selected_row = new_selected_row;
     }
 }
 
 
-PinsState* USB_C128D::get_output_pins(bool is_usb_capslock, bool is_usb_numlock) {
-    _reset_pins_state();
+void USB_C128D::_calculate_output_pins_state() {
+    _reset_output_pins_state();
     
     if (c128_capslock_lock_key.is_on()) {
         _set_output_key(usb_key_mapping[c128_capslock_lock_key.usb_key_code()]);
@@ -55,12 +102,13 @@ PinsState* USB_C128D::get_output_pins(bool is_usb_capslock, bool is_usb_numlock)
 
     // If the USB capslock is on, set left-shift 
     // (emulates shift-lock on C128D keyboard)
-    if (is_usb_capslock) {
+    if (is_usb_capslock()) {
         _set_output_key(usb_key_mapping[USB_KEY_LSHIFT]);
     }
 
     // Set the output pins state for every key in the buffer
-    usb_key_buffer.for_each([is_usb_capslock, is_usb_numlock](uint8_t usb_key_code) {
+    bool usb_numlock = is_usb_numlock();
+    usb_key_buffer.for_each([usb_numlock](uint8_t usb_key_code) {
         // If this key is within the accepted range
         if (usb_key_code <= MAX_USB_KEY_CODE) {
             // If up-arrow or left-arrow is pressed, set right-shift
@@ -72,7 +120,7 @@ PinsState* USB_C128D::get_output_pins(bool is_usb_capslock, bool is_usb_numlock)
             // Handle USB keypad keys depending on USB numlock state
             if (_is_keypad_key(usb_key_code)) {
                 // If numlock is on just send the keypad digit directly
-                if (is_usb_numlock) {
+                if (usb_numlock) {
                     _set_output_key(usb_key_mapping[usb_key_code]);
                 }
                 // If numlock is off and one of the keypad arrow digits pressed
@@ -100,6 +148,4 @@ PinsState* USB_C128D::get_output_pins(bool is_usb_capslock, bool is_usb_numlock)
             }
         }
     });
-
-    return &output_pins_state;
 }

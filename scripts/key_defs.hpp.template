@@ -1,0 +1,10 @@
+/** ${header_comment} */
+#ifndef KEY_DEFS_HPP
+#define KEY_DEFS_HPP
+
+// The highest USB key code that will be used
+#define MAX_USB_KEY_CODE ${max_usb_key_code}
+
+${usb_key_defs}
+
+#endif

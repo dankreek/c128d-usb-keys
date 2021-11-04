@@ -18,24 +18,20 @@ USBHub hub1(usb_host);
 USBHub hub2(usb_host);
 KeyboardController keyboard(usb_host);
 
-// Object which contains the "state machine" for the USB->128D keybaord adapter
-USB_C128D usb_c128d;
-
 // An array of all keyboard output pins, used for convenienty initialization
-uint8_t all_keyboard_pins[] = {
-	ROW0_PIN, ROW1_PIN, ROW2_PIN, ROW3_PIN, ROW4_PIN, ROW5_PIN, ROW6_PIN, ROW7_PIN,
-	RESTORE_PIN, FORTY_EIGHTY_PIN, CAPS_LOCK_PIN,
-	COL0_PIN, COL1_PIN, COL2_PIN, COL3_PIN, COL4_PIN, COL5_PIN, COL6_PIN, COL7_PIN,
-	K0_PIN, K1_PIN, K2_PIN,
-	RESTORE0_PIN
-};
+// uint8_t all_keyboard_pins[] = {
+// 	ROW0_PIN, ROW1_PIN, ROW2_PIN, ROW3_PIN, ROW4_PIN, ROW5_PIN, ROW6_PIN, ROW7_PIN,
+// 	RESTORE_PIN, FORTY_EIGHTY_PIN, CAPS_LOCK_PIN,
+// 	COL0_PIN, COL1_PIN, COL2_PIN, COL3_PIN, COL4_PIN, COL5_PIN, COL6_PIN, COL7_PIN,
+// 	K0_PIN, K1_PIN, K2_PIN
+// };
 
 
 // KeyboardController callback to handle key pressed
 void on_raw_press(uint8_t key_code) {
 	Serial.print("raw key press: 0x");
 	Serial.println((int)key_code, HEX);
-	usb_c128d.usb_key_down(key_code);
+	// usb_c128d.usb_key_down(key_code);
 }
 
 
@@ -43,7 +39,7 @@ void on_raw_press(uint8_t key_code) {
 void on_raw_release(uint8_t key_code) {
 	Serial.print("raw key release: 0x");
 	Serial.println((int)key_code, HEX);
-	usb_c128d.usb_key_up(key_code);
+	// usb_c128d.usb_key_up(key_code);
 }
 
 
@@ -79,10 +75,10 @@ void forty_eighty_lock_key_cb(bool is_locked) {
 // Read the previous states of the soft-lock keys from EEPROM and set them
 void restore_lock_key_states() {
 	bool capslock_state = read_eeprom_bool(capslock_state_eeprom_addr);
-	usb_c128d.c128_capslock_lock_key.set_is_on(capslock_state);
+	// usb_c128d.c128_capslock_lock_key.set_is_on(capslock_state);
 
 	bool forty_eighty_state = read_eeprom_bool(forty_eighty_lock_state_eeprom_addr);
-	usb_c128d.c128_4080_lock_key.set_is_on(forty_eighty_state);
+	// usb_c128d.c128_4080_lock_key.set_is_on(forty_eighty_state);
 }
 
 
@@ -91,10 +87,10 @@ void setup() {
 	Serial.begin(115200);
 
 	// Setup all output pins 
-	for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
-		// INPUT signals there is no connection
-		pinMode(all_keyboard_pins[i], INPUT);
-    }
+	// for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
+	// 	// INPUT signals there is no connection
+	// 	pinMode(all_keyboard_pins[i], INPUT);
+    // }
 
 	// Setup LED pins
 	pinMode(FORTY_EIGHTY_LOCK_LED, OUTPUT);
@@ -103,8 +99,8 @@ void setup() {
 	// restore lock key states from EEPROM
 	restore_lock_key_states();
 
-	usb_c128d.c128_capslock_lock_key.set_toggle_callback(capslock_lock_key_cb);
-	usb_c128d.c128_4080_lock_key.set_toggle_callback(forty_eighty_lock_key_cb);
+	// usb_c128d.c128_capslock_lock_key.set_toggle_callback(capslock_lock_key_cb);
+	// usb_c128d.c128_4080_lock_key.set_toggle_callback(forty_eighty_lock_key_cb);
 
 	// Setup USB Host and listen to the first keyboard found
 	usb_host.begin();
@@ -132,36 +128,36 @@ void loop() {
 	// Poll the USB keyboard and send all key up/key down events
 	usb_host.Task();
 
-	PinsState* output_pins_state = usb_c128d.get_output_pins(
-		keyboard.capsLock(),
-		keyboard.numLock()
-	);
+	// PinsState* output_pins_state = usb_c128d.get_output_pins(
+	// 	keyboard.capsLock(),
+	// 	keyboard.numLock()
+	// );
 
-	update_output_pin(output_pins_state->row0, ROW0_PIN);
-	update_output_pin(output_pins_state->row1, ROW1_PIN);
-	update_output_pin(output_pins_state->row2, ROW2_PIN);
-	update_output_pin(output_pins_state->row3, ROW3_PIN);
-	update_output_pin(output_pins_state->row4, ROW4_PIN);
-	update_output_pin(output_pins_state->row5, ROW5_PIN);
-	update_output_pin(output_pins_state->row6, ROW6_PIN);
-	update_output_pin(output_pins_state->row7, ROW7_PIN);
+	// update_output_pin(output_pins_state->row0, ROW0_PIN);
+	// update_output_pin(output_pins_state->row1, ROW1_PIN);
+	// update_output_pin(output_pins_state->row2, ROW2_PIN);
+	// update_output_pin(output_pins_state->row3, ROW3_PIN);
+	// update_output_pin(output_pins_state->row4, ROW4_PIN);
+	// update_output_pin(output_pins_state->row5, ROW5_PIN);
+	// update_output_pin(output_pins_state->row6, ROW6_PIN);
+	// update_output_pin(output_pins_state->row7, ROW7_PIN);
 
-	update_output_pin(output_pins_state->restore, RESTORE_PIN);
-	update_output_pin(output_pins_state->forty_eighty, FORTY_EIGHTY_PIN);
-	update_output_pin(output_pins_state->caps_lock, CAPS_LOCK_PIN);
+	// update_output_pin(output_pins_state->restore, RESTORE_PIN);
+	// update_output_pin(output_pins_state->forty_eighty, FORTY_EIGHTY_PIN);
+	// update_output_pin(output_pins_state->caps_lock, CAPS_LOCK_PIN);
 
-	update_output_pin(output_pins_state->col0, COL0_PIN);
-	update_output_pin(output_pins_state->col1, COL1_PIN);
-	update_output_pin(output_pins_state->col2, COL2_PIN);
-	update_output_pin(output_pins_state->col3, COL3_PIN);
-	update_output_pin(output_pins_state->col4, COL4_PIN);
-	update_output_pin(output_pins_state->col5, COL5_PIN);
-	update_output_pin(output_pins_state->col6, COL6_PIN);
-	update_output_pin(output_pins_state->col7, COL7_PIN);
+	// update_output_pin(output_pins_state->col0, COL0_PIN);
+	// update_output_pin(output_pins_state->col1, COL1_PIN);
+	// update_output_pin(output_pins_state->col2, COL2_PIN);
+	// update_output_pin(output_pins_state->col3, COL3_PIN);
+	// update_output_pin(output_pins_state->col4, COL4_PIN);
+	// update_output_pin(output_pins_state->col5, COL5_PIN);
+	// update_output_pin(output_pins_state->col6, COL6_PIN);
+	// update_output_pin(output_pins_state->col7, COL7_PIN);
 
-	update_output_pin(output_pins_state->k0, K0_PIN);
-	update_output_pin(output_pins_state->k1, K1_PIN);
-	update_output_pin(output_pins_state->k2, K2_PIN);
+	// update_output_pin(output_pins_state->k0, K0_PIN);
+	// update_output_pin(output_pins_state->k1, K1_PIN);
+	// update_output_pin(output_pins_state->k2, K2_PIN);
 
-	update_output_pin(output_pins_state->restore0, RESTORE0_PIN);
+	// update_output_pin(output_pins_state->restore0, RESTORE0_PIN);
 }

@@ -8,6 +8,26 @@
 
 class USB_C128D {
     public:
+        enum SelectedRow {
+            row0 = 0, 
+            row1 = 1, 
+            row2 = 2, 
+            row3 = 3, 
+            row4 = 4, 
+            row5 = 5, 
+            row6 = 6, 
+            row7 = 7, 
+            none = -1
+        };
+
+        USB_C128D();
+
+        /**
+         * Initialize outputs pins to the "nothing on" state. 
+         * This should be called directly after construction.
+         */
+        void init();
+
         /**
          * Signal that a key from the USB keyboard is currently being pressed
          * 
@@ -23,14 +43,12 @@ class USB_C128D {
         void usb_key_up(uint8_t usb_key_code);
 
         /**
-         * Return a pointer to a PinState struct which inidcates which output
-         * pins are being sent to ground based on which keys are currently
-         * being pressed.
+         *  Check to see if the input row from the C128 has changed.
          * 
-         * @param is_usb_capslock - Is the USB keyboard's capslock on?
-         * @param is_usb_numlock - Is the USB keyboard's numlock on?
+         * If it has, recalculate all output pins and set them to the desirec
+         * state via all the virtual methods implemented by the platform.
          */
-        PinsState* get_output_pins(bool is_usb_capslock, bool is_usb_numlock);
+        void poll_input_and_set_outputs();
 
         /**
          * Object which holds the state of the C128d's CapsLock key, which is
@@ -44,7 +62,38 @@ class USB_C128D {
          */
         LockKey c128_4080_lock_key = LockKey(USB_KEY_F7);
 
+    protected:
+        /** @return is the USB keyboard's capslock set? */
+        virtual bool is_usb_capslock() = 0;
+
+        /** @return is the USB keyboard's numlock set? */
+        virtual bool is_usb_numlock() = 0;
+
+        /**
+         * Scan the C128 keyboard's row pins and find if one of them is 
+         * requesting that columns should be set.
+         */
+        virtual SelectedRow selected_row() = 0;
+
+        /**
+         * Set all of the selected columns to logic LOW, set unselected columns
+         * to either logic HIGH (col0-col7), or NC (for k0, k1 and, k2).
+         */
+        virtual void set_cols(PinsRow& selected_cols) = 0;
+
+        /**
+         * Set all special key pins to either logic LOW or N/C
+         */
+        virtual void set_special_pins(SpecialKeys& selected_special_keys) = 0;
+
     private:
+        PinsRow unset_cols = {
+            {false, false, false, false, false, false, false, false},
+            false, false, false
+        };
+
+        SpecialKeys unset_sepcial_keys = { false, false, false };
+
         /**
          * Buffer holding all the currently pressed keys on the USB keyboard.
          * This buffer does not hold the F4 or F7 keys since those are only
@@ -52,7 +101,14 @@ class USB_C128D {
          */
         USBKeyBuffer usb_key_buffer;
 
-        static void _reset_pins_state();
+        /**
+         * The currently selected row pin. 
+         * Output pins are only changed when the input row changes.
+         */
+        SelectedRow _cur_selected_row = SelectedRow::none;
+
+        void _calculate_output_pins_state();
+        static void _reset_output_pins_state();
         static bool _is_keypad_key(uint8_t key_code);
         static void _set_output_key(KeyInfo key_info);
 };
