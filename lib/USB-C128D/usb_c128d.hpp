@@ -45,10 +45,10 @@ class USB_C128D {
         /**
          *  Check to see if the input row from the C128 has changed.
          * 
-         * If it has, recalculate all output pins and set them to the desirec
+         * If it has, recalculate all output pins and set them to the desired
          * state via all the virtual methods implemented by the platform.
          */
-        void poll_input_and_set_outputs();
+        void set_output_cols();
 
         /**
          * Object which holds the state of the C128d's CapsLock key, which is

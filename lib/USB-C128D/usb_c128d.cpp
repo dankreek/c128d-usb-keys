@@ -64,7 +64,7 @@ void USB_C128D::_set_output_key(KeyInfo key_info) {
 }
 
 
-void USB_C128D::poll_input_and_set_outputs() {
+void USB_C128D::set_output_cols() {
     SelectedRow new_selected_row = selected_row();
 
     // Only react to a state transition
