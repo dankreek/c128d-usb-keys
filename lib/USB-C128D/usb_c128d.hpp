@@ -8,25 +8,10 @@
 
 class USB_C128D {
     public:
-        enum SelectedRow {
-            row0 = 0, 
-            row1 = 1, 
-            row2 = 2, 
-            row3 = 3, 
-            row4 = 4, 
-            row5 = 5, 
-            row6 = 6, 
-            row7 = 7, 
-            none = -1
-        };
+        /** A special key that should be set or unset */
+        enum SpecialKey { restore, caps_lock, forty_eighty };
 
         USB_C128D();
-
-        /**
-         * Initialize outputs pins to the "nothing on" state. 
-         * This should be called directly after construction.
-         */
-        void init();
 
         /**
          * Signal that a key from the USB keyboard is currently being pressed
@@ -41,14 +26,6 @@ class USB_C128D {
          * @param usb_key_code - USB key code
          */
         void usb_key_up(uint8_t usb_key_code);
-
-        /**
-         *  Check to see if the input row from the C128 has changed.
-         * 
-         * If it has, recalculate all output pins and set them to the desired
-         * state via all the virtual methods implemented by the platform.
-         */
-        void set_output_cols();
 
         /**
          * Object which holds the state of the C128d's CapsLock key, which is
@@ -70,29 +47,33 @@ class USB_C128D {
         virtual bool is_usb_numlock() = 0;
 
         /**
-         * Scan the C128 keyboard's row pins and find if one of them is 
-         * requesting that columns should be set.
+         * @brief Set one of the keyboard matrix switches to the on of off state
+         * 
+         * @param row       Row number to set
+         * @param column    Column number to set 
+         * @param is_closed Is the switch closed or open? 
          */
-        virtual SelectedRow selected_row() = 0;
+        virtual void set_switch(uint8_t row, uint8_t column, bool is_closed) = 0;
 
         /**
-         * Set all of the selected columns to logic LOW, set unselected columns
-         * to either logic HIGH (col0-col7), or NC (for k0, k1 and, k2).
+         * @brief Set the state of one of the special keys.
+         * 
+         * These are the keys that are directly connected to ground when they 
+         * are activated. 
+         * 
+         * @param key       Special key to set the output state of
+         * @param is_closed Is this key connected to ground or lifted?
          */
-        virtual void set_cols(PinsRow& selected_cols) = 0;
+        virtual void set_special_key(SpecialKey key, bool is_closed) = 0;
 
         /**
-         * Set all special key pins to either logic LOW or N/C
+         * @brief Close all switches in the output keyboard matrix
          */
-        virtual void set_special_pins(SpecialKeys& selected_special_keys) = 0;
+        virtual void reset_matrix() = 0;
 
     private:
-        PinsRow unset_cols = {
-            {false, false, false, false, false, false, false, false},
-            false, false, false
-        };
-
-        SpecialKeys unset_sepcial_keys = { false, false, false };
+        // Stores the current state of the output key matrix
+        PinsState current_matrix_state;
 
         /**
          * Buffer holding all the currently pressed keys on the USB keyboard.
@@ -101,14 +82,8 @@ class USB_C128D {
          */
         USBKeyBuffer usb_key_buffer;
 
-        /**
-         * The currently selected row pin. 
-         * Output pins are only changed when the input row changes.
-         */
-        SelectedRow _cur_selected_row = SelectedRow::none;
-
-        void _calculate_output_pins_state();
-        static void _reset_output_pins_state();
+        void _calculate_new_matrix_state();
+        void _update_cur_matrix_state();
         static bool _is_keypad_key(uint8_t key_code);
         static void _set_output_key(KeyInfo key_info);
 };

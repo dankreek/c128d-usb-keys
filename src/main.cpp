@@ -13,10 +13,10 @@ const int forty_eighty_lock_state_eeprom_addr = 1;
 
 
 // Add a USB host, support two hubs and use the first keyboard found
-USBHost usb_host;
-USBHub hub1(usb_host);
-USBHub hub2(usb_host);
-KeyboardController keyboard(usb_host);
+// USBHost usb_host;
+// USBHub hub1(usb_host);
+// USBHub hub2(usb_host);
+// KeyboardController keyboard(usb_host);
 
 // An array of all keyboard output pins, used for convenienty initialization
 // uint8_t all_keyboard_pins[] = {
@@ -81,6 +81,44 @@ void restore_lock_key_states() {
 	// usb_c128d.c128_4080_lock_key.set_is_on(forty_eighty_state);
 }
 
+#define S0 33
+#define S1 34
+#define S2 35
+#define Z 36
+#define READ_DELAY_US 1
+
+#define COL0 32
+#define COL1 31
+#define COL2 30
+#define COL3 29
+#define COL4 28
+#define COL5 27
+#define COL6 26
+#define COL7 25
+
+
+elapsedMillis since_measure;
+int select_count[8];
+int multiples_count;
+uint8_t last_selected;
+uint8_t last_multi_pattern;
+uint8_t full_count;
+uint8_t empty_count;
+
+
+void clear_measurements() {
+	for (int i=0; i < 8; i++) {
+		select_count[i] = 0;
+	}
+
+	since_measure = 0;
+	multiples_count = 0;
+	last_selected = 0;
+	full_count = 0;
+	empty_count = 0;
+}
+
+
 
 void setup() {
 	// Setup debugging output
@@ -93,71 +131,175 @@ void setup() {
     // }
 
 	// Setup LED pins
-	pinMode(FORTY_EIGHTY_LOCK_LED, OUTPUT);
-	pinMode(CAPSLOCK_LOCK_LED, OUTPUT);
+	// pinMode(FORTY_EIGHTY_LOCK_LED, OUTPUT);
+	// pinMode(CAPSLOCK_LOCK_LED, OUTPUT);
 
 	// restore lock key states from EEPROM
-	restore_lock_key_states();
+	// restore_lock_key_states();
 
 	// usb_c128d.c128_capslock_lock_key.set_toggle_callback(capslock_lock_key_cb);
 	// usb_c128d.c128_4080_lock_key.set_toggle_callback(forty_eighty_lock_key_cb);
 
 	// Setup USB Host and listen to the first keyboard found
-	usb_host.begin();
-	keyboard.attachRawPress(on_raw_press);
-	keyboard.attachRawRelease(on_raw_release);
+	// usb_host.begin();
+	// keyboard.attachRawPress(on_raw_press);
+	// keyboard.attachRawRelease(on_raw_release);
+
+	pinMode(S0, OUTPUT);
+	pinMode(S1, OUTPUT);
+	pinMode(S2, OUTPUT);
+	pinMode(Z, INPUT);
+
+	pinMode(COL0, INPUT);
+	pinMode(COL1, INPUT);
+	pinMode(COL2, INPUT);
+	pinMode(COL3, INPUT);
+	pinMode(COL4, INPUT);
+	pinMode(COL5, INPUT);
+	pinMode(COL6, INPUT);
+	pinMode(COL7, INPUT);
+
+	clear_measurements();
+}
+
+uint8_t selected_cols_mux() {
+	uint8_t retval = 0;
+
+	digitalWriteFast(S0, HIGH);
+	digitalWriteFast(S1, HIGH);
+	digitalWriteFast(S2, HIGH);
+	delayMicroseconds(READ_DELAY_US);
+	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
+	retval <<= 1;
+
+	digitalWriteFast(S0, LOW);
+	delayMicroseconds(READ_DELAY_US);
+	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
+	retval <<= 1;
+
+	digitalWriteFast(S0, HIGH);
+	digitalWriteFast(S1, LOW);
+	delayMicroseconds(READ_DELAY_US);
+	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
+	retval <<= 1;
+
+	digitalWriteFast(S0, LOW);
+	delayMicroseconds(READ_DELAY_US);
+	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
+	retval <<= 1;
+
+	digitalWriteFast(S0, HIGH);
+	digitalWriteFast(S1, HIGH);
+	digitalWriteFast(S2, LOW);
+	delayMicroseconds(READ_DELAY_US);
+	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
+	retval <<= 1;
+
+	digitalWriteFast(S0, LOW);
+	delayMicroseconds(READ_DELAY_US);
+	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
+	retval <<= 1;
+
+	digitalWriteFast(S0, HIGH);
+	digitalWriteFast(S1, LOW);
+	delayMicroseconds(READ_DELAY_US);
+	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
+	retval <<= 1;
+
+	digitalWriteFast(S0, LOW);
+	delayMicroseconds(READ_DELAY_US);
+	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
+
+	return retval;
 }
 
 
-/**
- * Set the C128D keyboard output pin to either GND or NC (no connection)
- * 
- * @param pin_num - Teensy3.6 output pin number 
- * @param is_gnd - Is this pin set to GND (output LOW) or NC (INPUT)?
- */
-void update_output_pin(uint8_t pin_num, bool is_gnd) {
-	if (is_gnd) {
-		pinMode(pin_num, OUTPUT);
-	} else {
-		pinMode(pin_num, INPUT);
-	}
+uint8_t selected_cols() {
+	uint8_t retval = 0;
+
+	if (!digitalReadFast(COL7)) retval++;
+	retval <<= 1;
+
+	if (!digitalReadFast(COL6)) retval++;
+	retval <<= 1;
+
+	if (!digitalReadFast(COL5)) retval++;
+	retval <<= 1;
+
+	if (!digitalReadFast(COL4)) retval++;
+	retval <<= 1;
+
+	if (!digitalReadFast(COL3)) retval++;
+	retval <<= 1;
+
+	if (!digitalReadFast(COL2)) retval++;
+	retval <<= 1;
+
+	if (!digitalReadFast(COL1)) retval++;
+	retval <<= 1;
+
+	if (!digitalReadFast(COL0)) retval++;
+	
+	return retval;
 }
 
+bool is_selected(uint8_t mask, int bit_num) {
+	return ((mask >> bit_num) & 0x01) == 1;
+}
 
 void loop() {
-	// Poll the USB keyboard and send all key up/key down events
-	usb_host.Task();
+	// also store stats for when multiple pins are brought low
+	uint8_t selected = selected_cols();
 
-	// PinsState* output_pins_state = usb_c128d.get_output_pins(
-	// 	keyboard.capsLock(),
-	// 	keyboard.numLock()
-	// );
+	if (selected != last_selected) {
+		for (int i=0; i < 8; i++) {
+			if (is_selected(selected, i) && !is_selected(last_selected, i)) {
+				select_count[i] += 1;
+			}
+		}
 
-	// update_output_pin(output_pins_state->row0, ROW0_PIN);
-	// update_output_pin(output_pins_state->row1, ROW1_PIN);
-	// update_output_pin(output_pins_state->row2, ROW2_PIN);
-	// update_output_pin(output_pins_state->row3, ROW3_PIN);
-	// update_output_pin(output_pins_state->row4, ROW4_PIN);
-	// update_output_pin(output_pins_state->row5, ROW5_PIN);
-	// update_output_pin(output_pins_state->row6, ROW6_PIN);
-	// update_output_pin(output_pins_state->row7, ROW7_PIN);
+		switch (selected) {
+			case 0x01:
+			case 0x02:
+			case 0x04:
+			case 0x08:
+			case 0x10:
+			case 0x20:
+			case 0x40:
+			case 0x80:
+				break;
+			case 0x00:
+				empty_count++;
+				break;
+			case 0xff:
+				full_count++;
+				break;
+			default:
+				multiples_count++;
+				last_multi_pattern = selected;
+				break;
+		};
 
-	// update_output_pin(output_pins_state->restore, RESTORE_PIN);
-	// update_output_pin(output_pins_state->forty_eighty, FORTY_EIGHTY_PIN);
-	// update_output_pin(output_pins_state->caps_lock, CAPS_LOCK_PIN);
+		last_selected = selected;
+	}
 
-	// update_output_pin(output_pins_state->col0, COL0_PIN);
-	// update_output_pin(output_pins_state->col1, COL1_PIN);
-	// update_output_pin(output_pins_state->col2, COL2_PIN);
-	// update_output_pin(output_pins_state->col3, COL3_PIN);
-	// update_output_pin(output_pins_state->col4, COL4_PIN);
-	// update_output_pin(output_pins_state->col5, COL5_PIN);
-	// update_output_pin(output_pins_state->col6, COL6_PIN);
-	// update_output_pin(output_pins_state->col7, COL7_PIN);
+	if (since_measure >= 1000) {
+		for (int i=0; i < 8; i++) {
+			Serial.print(i);
+			Serial.print("=");
+			Serial.print(select_count[i]);
+			Serial.print("hz ");
+		}
+		Serial.println();
+		Serial.print("Empty=");
+		Serial.print(empty_count);
+		Serial.print(" Full=");
+		Serial.print(full_count);
+		Serial.print(" Multiples=");
+		Serial.print(multiples_count);
+		Serial.print(" Pattern=");
+		Serial.println(last_multi_pattern, HEX);
 
-	// update_output_pin(output_pins_state->k0, K0_PIN);
-	// update_output_pin(output_pins_state->k1, K1_PIN);
-	// update_output_pin(output_pins_state->k2, K2_PIN);
-
-	// update_output_pin(output_pins_state->restore0, RESTORE0_PIN);
+		clear_measurements();
+	}
 }

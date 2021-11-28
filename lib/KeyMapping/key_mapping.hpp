@@ -13,14 +13,27 @@ struct SpecialKeys {
 
 // One row of pins in the keybaord matrix
 struct PinsRow {
-    bool cols[8]; 
-    bool k0, k1, k2;         
+    bool cols[11]; 
+
+    void reset() {
+        for (int i=0; i < 11; i++) cols[i] = false;
+    }
 };
 
 // Represents the state of all output pins, in the keyboar matrix. 
 struct PinsState {
     PinsRow rows[8];       
     SpecialKeys special;
+
+    void reset() {
+        for (int i=0; i < 8; i++) {
+            rows[i].reset();
+        }
+
+        special.caps_lock = false;
+        special.forty_eighty = false;
+        special.restore = false;
+    }
 };
 
 // An instance of PinsState for the key mapping 
@@ -45,6 +58,5 @@ extern KeyInfo numlock_off_kp_2;
 extern KeyInfo numlock_off_kp_4;
 extern KeyInfo numlock_off_kp_6;
 extern KeyInfo numlock_off_kp_8;
-
 
 #endif

@@ -30,9 +30,9 @@ class Matrix(Enum):
     col5 = 'cols[5]' 
     col6 = 'cols[6]' 
     col7 = 'cols[7]' 
-    k0 = 'k0'
-    k1 = 'k1'
-    k2 = 'k2'
+    k0 = 'cols[8]'
+    k1 = 'cols[9]'
+    k2 = 'cols[10]'
 
     restore = 'restore'
     forty_eighty = 'forty_eighty'

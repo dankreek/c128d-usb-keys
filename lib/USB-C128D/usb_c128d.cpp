@@ -1,15 +1,11 @@
+#include <cstring>
 #include "usb_c128d.hpp"
 
 
 USB_C128D::USB_C128D() {
     // Reset all output pins to unselected and force an update
-    _reset_output_pins_state();
-}
-
-
-void USB_C128D::init() {
-    set_cols(unset_cols);
-    set_special_pins(unset_sepcial_keys);
+    output_pins_state.reset();
+    current_matrix_state.reset();
 }
 
 
@@ -22,6 +18,9 @@ void USB_C128D::usb_key_down(uint8_t usb_key_code) {
     } else {
         usb_key_buffer.add(usb_key_code);
     }
+    
+    _calculate_new_matrix_state();
+    _update_cur_matrix_state();
 }
 
 
@@ -30,27 +29,10 @@ void USB_C128D::usb_key_up(uint8_t usb_key_code) {
 	if ((usb_key_code != c128_capslock_lock_key.usb_key_code()) && 
         (usb_key_code != c128_4080_lock_key.usb_key_code())) {
 		usb_key_buffer.remove(usb_key_code);
+
+        _calculate_new_matrix_state();
+        _update_cur_matrix_state();
 	}
-}
-
-
-/**
- * Reset all output pins for each row in the matrix back to false
- */
-void USB_C128D::_reset_output_pins_state() {
-    for (int row_i=0; row_i < 8; row_i++) {
-        for (int col_i=0; col_i < 8; col_i++) {
-            output_pins_state.rows[row_i].cols[col_i] = false;
-        }
-
-        output_pins_state.rows[row_i].k0 = false;
-        output_pins_state.rows[row_i].k1 = false;
-        output_pins_state.rows[row_i].k2 = false;
-    }
-
-    output_pins_state.special.restore = false;
-    output_pins_state.special.caps_lock = false;
-    output_pins_state.special.forty_eighty = false;
 }
 
 
@@ -64,33 +46,36 @@ void USB_C128D::_set_output_key(KeyInfo key_info) {
 }
 
 
-void USB_C128D::set_output_cols() {
-    SelectedRow new_selected_row = selected_row();
-
-    // Only react to a state transition
-    if (new_selected_row != _cur_selected_row) {
-        // C128 is done reading keyboard state so clear the outputs and send them
-        if (new_selected_row == SelectedRow::none) {
-            set_cols(unset_cols);
-        }
-        else {
-            // The C128 is now asking for the new keyboard state
-            // so, recalculate it, and set the special pins
-            if (new_selected_row == SelectedRow::row0) {
-                _calculate_output_pins_state();
-                set_special_pins(output_pins_state.special);
+void USB_C128D::_update_cur_matrix_state() {
+    for (int row_i=0; row_i < 8; row_i++) {
+        for (int col_i=0; col_i < 11; col_i++) {
+            bool desired_state = output_pins_state.rows[row_i].cols[col_i];
+            if (current_matrix_state.rows[row_i].cols[col_i] != desired_state) {
+                set_switch(row_i, col_i, desired_state);
+                current_matrix_state.rows[row_i].cols[col_i] = desired_state;
             }
-
-            set_cols(output_pins_state.rows[new_selected_row]);
         }
+    }
 
-        _cur_selected_row = new_selected_row;
+    if (output_pins_state.special.caps_lock != current_matrix_state.special.caps_lock) {
+        set_special_key(caps_lock, output_pins_state.special.caps_lock);
+        current_matrix_state.special.caps_lock = output_pins_state.special.caps_lock;
+    }
+    
+    if (output_pins_state.special.forty_eighty != current_matrix_state.special.forty_eighty) {
+        set_special_key(forty_eighty, output_pins_state.special.forty_eighty);
+        current_matrix_state.special.forty_eighty = output_pins_state.special.forty_eighty;
+    }
+
+    if (output_pins_state.special.restore != current_matrix_state.special.restore) {
+        set_special_key(restore, output_pins_state.special.restore);
+        current_matrix_state.special.restore = output_pins_state.special.restore;
     }
 }
 
 
-void USB_C128D::_calculate_output_pins_state() {
-    _reset_output_pins_state();
+void USB_C128D::_calculate_new_matrix_state() {
+    output_pins_state.reset();
     
     if (c128_capslock_lock_key.is_on()) {
         _set_output_key(usb_key_mapping[c128_capslock_lock_key.usb_key_code()]);
