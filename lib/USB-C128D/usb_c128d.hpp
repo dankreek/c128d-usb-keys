@@ -11,7 +11,15 @@ class USB_C128D {
         /** A special key that should be set or unset */
         enum SpecialKey { restore, caps_lock, forty_eighty };
 
-        USB_C128D();
+        /** 
+         * @brief Initialize the C128D keyboard interface 
+         */
+        void begin();
+
+        /**
+         * @brief Poll method to update the output keyboard matrix
+         */
+        void task();
 
         /**
          * Signal that a key from the USB keyboard is currently being pressed
@@ -69,7 +77,7 @@ class USB_C128D {
         /**
          * @brief Close all switches in the output keyboard matrix
          */
-        virtual void reset_matrix() = 0;
+        virtual void reset_output_matrix() = 0;
 
     private:
         // Stores the current state of the output key matrix

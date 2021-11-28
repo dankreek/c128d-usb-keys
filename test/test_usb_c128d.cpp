@@ -10,10 +10,6 @@ class MockUSB_C128D : public USB_C128D {
         bool mock_usb_numlock_set = false;
         PinsState pins_set;
 
-        MockUSB_C128D() : USB_C128D() {
-            reset_matrix();
-        }
-
     protected:
         bool is_usb_capslock() { return mock_usb_capslock_set; }
         bool is_usb_numlock() { return mock_usb_numlock_set; }
@@ -36,7 +32,7 @@ class MockUSB_C128D : public USB_C128D {
             }
         }
 
-        void reset_matrix() { pins_set.reset(); }
+        void reset_output_matrix() { pins_set.reset(); }
 };
 
 
@@ -111,57 +107,69 @@ void _combine_pins(PinsState &state_a, PinsState &state_b, PinsState &output) {
 
 
 void test_no_keys_pressed() {
-    MockUSB_C128D usb_c128d = MockUSB_C128D(); 
+    MockUSB_C128D usb_c128d;  
+    usb_c128d.begin();
+    usb_c128d.task();
+
     TEST_ASSERT_EQUAL_MEMORY(&expected_no_keys, &usb_c128d.pins_set, sizeof(PinsState));
 }
 
 
 void test_single_key_press() {
-    MockUSB_C128D usb_c128d = MockUSB_C128D();
+    MockUSB_C128D usb_c128d;
     PinsState received;
 
+    usb_c128d.begin();
     usb_c128d.usb_key_down(USB_KEY_A);
+    usb_c128d.task();
 
     TEST_ASSERT_EQUAL_MEMORY(&expected_a_switches, &usb_c128d.pins_set, sizeof(PinsState));
 }
 
 
 void test_key_down_and_key_up() {
-    MockUSB_C128D usb_c128d = MockUSB_C128D();
+    MockUSB_C128D usb_c128d;
+    usb_c128d.begin();
 
     usb_c128d.usb_key_down(USB_KEY_A);
+    usb_c128d.task();
     TEST_ASSERT_EQUAL_MEMORY(&expected_a_switches, &usb_c128d.pins_set, sizeof(PinsState));
 
     usb_c128d.usb_key_up(USB_KEY_A);
+    usb_c128d.task();
     TEST_ASSERT_EQUAL_MEMORY(&expected_no_keys, &usb_c128d.pins_set, sizeof(PinsState));
 }
 
 
 void test_multiple_keys_pressed() {
-    MockUSB_C128D usb_c128d = MockUSB_C128D();
+    MockUSB_C128D usb_c128d;
     PinsState expected;
     _combine_pins(expected_a_switches, expected_b_switches, expected);
 
+    usb_c128d.begin();
     usb_c128d.usb_key_down(USB_KEY_A);
     usb_c128d.usb_key_down(USB_KEY_B);
+    usb_c128d.task();
 
     TEST_ASSERT_EQUAL_MEMORY(&expected, &usb_c128d.pins_set, sizeof(PinsState));
 }
 
 
 void test_usb_capslock_on() {
-    MockUSB_C128D usb_c128d = MockUSB_C128D();
+    MockUSB_C128D usb_c128d;
     PinsState expected;
     _combine_pins(expected_left_shift, expected_a_switches, expected);
 
+    usb_c128d.begin();
     usb_c128d.mock_usb_capslock_set = true;
     usb_c128d.usb_key_down(USB_KEY_A);
+    usb_c128d.task();
     TEST_ASSERT_EQUAL_MEMORY(&expected, &usb_c128d.pins_set, sizeof(PinsState));
 }
 
 
 void test_usb_numlock() {
-    MockUSB_C128D usb_c128d = MockUSB_C128D();
+    MockUSB_C128D usb_c128d;
     PinsState expected_kp_4 = {
         {
         {false, false, false, false, false, false, false, false, false, false, false},
@@ -190,8 +198,10 @@ void test_usb_numlock() {
         {false, false, false}
     };
 
+    usb_c128d.begin();
     usb_c128d.mock_usb_numlock_set = true;
     usb_c128d.usb_key_down(USB_KEY_KP_4);
+    usb_c128d.task();
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_kp_4, &usb_c128d.pins_set, sizeof(PinsState),
         "Should send numeric key if numlock is on"
@@ -200,6 +210,7 @@ void test_usb_numlock() {
 
     usb_c128d.mock_usb_numlock_set = false;
     usb_c128d.usb_key_down(USB_KEY_KP_4);
+    usb_c128d.task();
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_top_cursor_left, &usb_c128d.pins_set, sizeof(PinsState),
         "Should send arrow key if numlock is off"
@@ -207,7 +218,7 @@ void test_usb_numlock() {
 }
 
 void test_4080_lock_key() {
-    MockUSB_C128D usb_c128d = MockUSB_C128D();
+    MockUSB_C128D usb_c128d;
     PinsState expected_4080_lock = {
         {
         {false, false, false, false, false, false, false, false, false, false, false},
@@ -222,7 +233,9 @@ void test_4080_lock_key() {
         {false, true, false}
     };
 
+    usb_c128d.begin();
     usb_c128d.usb_key_down(usb_c128d.c128_4080_lock_key.usb_key_code());
+    usb_c128d.task();
 
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_4080_lock, &usb_c128d.pins_set, sizeof(PinsState),
@@ -235,6 +248,7 @@ void test_4080_lock_key() {
     )
 
     usb_c128d.usb_key_up(usb_c128d.c128_4080_lock_key.usb_key_code());
+    usb_c128d.task();
 
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_4080_lock, &usb_c128d.pins_set, sizeof(PinsState),
@@ -242,6 +256,7 @@ void test_4080_lock_key() {
     );
 
     usb_c128d.usb_key_down(usb_c128d.c128_4080_lock_key.usb_key_code());
+    usb_c128d.task();
 
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_no_keys, &usb_c128d.pins_set, sizeof(PinsState),
@@ -254,6 +269,7 @@ void test_4080_lock_key() {
     )
 
     usb_c128d.usb_key_up(usb_c128d.c128_4080_lock_key.usb_key_code());
+    usb_c128d.task();
 
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_no_keys, &usb_c128d.pins_set, sizeof(PinsState),
@@ -262,7 +278,7 @@ void test_4080_lock_key() {
 }
 
 void test_cursor_keys() {
-    MockUSB_C128D usb_c128d = MockUSB_C128D();
+    MockUSB_C128D usb_c128d;
     PinsState expected_cursor_right = {
         {
         {false, false, false, false, false, false, false, false, false, false, false},
@@ -305,7 +321,9 @@ void test_cursor_keys() {
         {false, false, false}
     };
 
+    usb_c128d.begin();
     usb_c128d.usb_key_down(USB_KEY_RIGHT);
+    usb_c128d.task();
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_cursor_right, &usb_c128d.pins_set, sizeof(PinsState),
         "USB right cursor should send right cursor"
@@ -316,6 +334,7 @@ void test_cursor_keys() {
     _combine_pins(expected_cursor_right, expected_right_shift, expected_shift_cursor);
 
     usb_c128d.usb_key_down(USB_KEY_LEFT);
+    usb_c128d.task();
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_shift_cursor, &usb_c128d.pins_set, sizeof(PinsState),
         "USB left cursor should send shift-right cursor"
@@ -323,6 +342,7 @@ void test_cursor_keys() {
     usb_c128d.usb_key_up(USB_KEY_LEFT);
 
     usb_c128d.usb_key_down(USB_KEY_DOWN);
+    usb_c128d.task();
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_cursor_down, &usb_c128d.pins_set, sizeof(PinsState),
         "USB down cursor should send down cursor"
@@ -331,11 +351,11 @@ void test_cursor_keys() {
 
     _combine_pins(expected_cursor_down, expected_right_shift, expected_shift_cursor);
     usb_c128d.usb_key_down(USB_KEY_UP);
+    usb_c128d.task();
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
         &expected_shift_cursor, &usb_c128d.pins_set, sizeof(PinsState),
         "USB up cursor should send shift-down cursor"
     );
-    usb_c128d.usb_key_up(USB_KEY_UP);
 }
 
 

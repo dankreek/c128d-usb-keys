@@ -2,10 +2,17 @@
 #include "usb_c128d.hpp"
 
 
-USB_C128D::USB_C128D() {
+void USB_C128D::begin() {
     // Reset all output pins to unselected and force an update
     output_pins_state.reset();
     current_matrix_state.reset();
+    reset_output_matrix();
+}
+
+
+void USB_C128D::task() {
+    _calculate_new_matrix_state();
+    _update_cur_matrix_state();
 }
 
 
@@ -18,9 +25,6 @@ void USB_C128D::usb_key_down(uint8_t usb_key_code) {
     } else {
         usb_key_buffer.add(usb_key_code);
     }
-    
-    _calculate_new_matrix_state();
-    _update_cur_matrix_state();
 }
 
 
@@ -29,9 +33,6 @@ void USB_C128D::usb_key_up(uint8_t usb_key_code) {
 	if ((usb_key_code != c128_capslock_lock_key.usb_key_code()) && 
         (usb_key_code != c128_4080_lock_key.usb_key_code())) {
 		usb_key_buffer.remove(usb_key_code);
-
-        _calculate_new_matrix_state();
-        _update_cur_matrix_state();
 	}
 }
 
