@@ -2,7 +2,9 @@
 #include <USBHost_t36.h>
 #include <eeprom_funcs.hpp>
 #include <usb_c128d.hpp>
+#include <shift_register.hpp>
 #include "output_pins.hpp"
+
 
 // How "bright" a lock key's indicator is. 
 const uint8_t led_brightness = 120;
@@ -81,48 +83,13 @@ void restore_lock_key_states() {
 	// usb_c128d.c128_4080_lock_key.set_is_on(forty_eighty_state);
 }
 
-#define S0 33
-#define S1 34
-#define S2 35
-#define Z 36
-#define READ_DELAY_US 1
-
-#define COL0 32
-#define COL1 31
-#define COL2 30
-#define COL3 29
-#define COL4 28
-#define COL5 27
-#define COL6 26
-#define COL7 25
-
-
-elapsedMillis since_measure;
-int select_count[8];
-int multiples_count;
-uint8_t last_selected;
-uint8_t last_multi_pattern;
-uint8_t full_count;
-uint8_t empty_count;
-
-
-void clear_measurements() {
-	for (int i=0; i < 8; i++) {
-		select_count[i] = 0;
-	}
-
-	since_measure = 0;
-	multiples_count = 0;
-	last_selected = 0;
-	full_count = 0;
-	empty_count = 0;
-}
-
-
+OutputShiftRegister shift_register(30, 32, 31);
+uint8_t counter;
 
 void setup() {
 	// Setup debugging output
 	Serial.begin(115200);
+	counter = 63;
 
 	// Setup all output pins 
 	// for (int i=0; i < OUTPUT_PINS_COUNT; i++) {
@@ -144,162 +111,16 @@ void setup() {
 	// usb_host.begin();
 	// keyboard.attachRawPress(on_raw_press);
 	// keyboard.attachRawRelease(on_raw_release);
-
-	pinMode(S0, OUTPUT);
-	pinMode(S1, OUTPUT);
-	pinMode(S2, OUTPUT);
-	pinMode(Z, INPUT);
-
-	pinMode(COL0, INPUT);
-	pinMode(COL1, INPUT);
-	pinMode(COL2, INPUT);
-	pinMode(COL3, INPUT);
-	pinMode(COL4, INPUT);
-	pinMode(COL5, INPUT);
-	pinMode(COL6, INPUT);
-	pinMode(COL7, INPUT);
-
-	clear_measurements();
+	shift_register.begin();
 }
 
-uint8_t selected_cols_mux() {
-	uint8_t retval = 0;
-
-	digitalWriteFast(S0, HIGH);
-	digitalWriteFast(S1, HIGH);
-	digitalWriteFast(S2, HIGH);
-	delayMicroseconds(READ_DELAY_US);
-	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
-	retval <<= 1;
-
-	digitalWriteFast(S0, LOW);
-	delayMicroseconds(READ_DELAY_US);
-	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
-	retval <<= 1;
-
-	digitalWriteFast(S0, HIGH);
-	digitalWriteFast(S1, LOW);
-	delayMicroseconds(READ_DELAY_US);
-	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
-	retval <<= 1;
-
-	digitalWriteFast(S0, LOW);
-	delayMicroseconds(READ_DELAY_US);
-	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
-	retval <<= 1;
-
-	digitalWriteFast(S0, HIGH);
-	digitalWriteFast(S1, HIGH);
-	digitalWriteFast(S2, LOW);
-	delayMicroseconds(READ_DELAY_US);
-	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
-	retval <<= 1;
-
-	digitalWriteFast(S0, LOW);
-	delayMicroseconds(READ_DELAY_US);
-	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
-	retval <<= 1;
-
-	digitalWriteFast(S0, HIGH);
-	digitalWriteFast(S1, LOW);
-	delayMicroseconds(READ_DELAY_US);
-	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
-	retval <<= 1;
-
-	digitalWriteFast(S0, LOW);
-	delayMicroseconds(READ_DELAY_US);
-	if (!(digitalReadFast(Z) && digitalReadFast(Z))) retval++;
-
-	return retval;
-}
-
-
-uint8_t selected_cols() {
-	uint8_t retval = 0;
-
-	if (!digitalReadFast(COL7)) retval++;
-	retval <<= 1;
-
-	if (!digitalReadFast(COL6)) retval++;
-	retval <<= 1;
-
-	if (!digitalReadFast(COL5)) retval++;
-	retval <<= 1;
-
-	if (!digitalReadFast(COL4)) retval++;
-	retval <<= 1;
-
-	if (!digitalReadFast(COL3)) retval++;
-	retval <<= 1;
-
-	if (!digitalReadFast(COL2)) retval++;
-	retval <<= 1;
-
-	if (!digitalReadFast(COL1)) retval++;
-	retval <<= 1;
-
-	if (!digitalReadFast(COL0)) retval++;
-	
-	return retval;
-}
-
-bool is_selected(uint8_t mask, int bit_num) {
-	return ((mask >> bit_num) & 0x01) == 1;
+uint8_t rotl(uint8_t input) {
+	bool has_hi_bit = input & 0x80;
+	return (input << 1) | (has_hi_bit ? 0x01 : 0x00);
 }
 
 void loop() {
-	// also store stats for when multiple pins are brought low
-	uint8_t selected = selected_cols();
-
-	if (selected != last_selected) {
-		for (int i=0; i < 8; i++) {
-			if (is_selected(selected, i) && !is_selected(last_selected, i)) {
-				select_count[i] += 1;
-			}
-		}
-
-		switch (selected) {
-			case 0x01:
-			case 0x02:
-			case 0x04:
-			case 0x08:
-			case 0x10:
-			case 0x20:
-			case 0x40:
-			case 0x80:
-				break;
-			case 0x00:
-				empty_count++;
-				break;
-			case 0xff:
-				full_count++;
-				break;
-			default:
-				multiples_count++;
-				last_multi_pattern = selected;
-				break;
-		};
-
-		last_selected = selected;
-	}
-
-	if (since_measure >= 1000) {
-		for (int i=0; i < 8; i++) {
-			Serial.print(i);
-			Serial.print("=");
-			Serial.print(select_count[i]);
-			Serial.print("hz ");
-		}
-		Serial.println();
-		Serial.print("Empty=");
-		Serial.print(empty_count);
-		Serial.print(" Full=");
-		Serial.print(full_count);
-		Serial.print(" Multiples=");
-		Serial.print(multiples_count);
-		Serial.print(" Pattern=");
-		Serial.println(last_multi_pattern, HEX);
-
-		clear_measurements();
-	}
+    shift_register.set_output_pins(counter);
+	counter += 1;
+	delay(500);
 }
