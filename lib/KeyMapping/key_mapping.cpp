@@ -9,17 +9,17 @@ KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1] = {
     /* 0x01 */  {false, nullptr},
     /* 0x02 */  {false, nullptr},
     /* 0x03 */  {false, nullptr},
-    /* 0x04 */  {true, &output_pins_state.rows[1].cols[2]}, // USB_KEY_A => a
+    /* 0x04 */  {true, &output_pins_state.rows[2].cols[1]}, // USB_KEY_A => a
     /* 0x05 */  {true, &output_pins_state.rows[4].cols[3]}, // USB_KEY_B => b
     /* 0x06 */  {true, &output_pins_state.rows[4].cols[2]}, // USB_KEY_C => c
     /* 0x07 */  {true, &output_pins_state.rows[2].cols[2]}, // USB_KEY_D => d
     /* 0x08 */  {true, &output_pins_state.rows[6].cols[1]}, // USB_KEY_E => e
-    /* 0x09 */  {true, &output_pins_state.rows[5].cols[5]}, // USB_KEY_F => f
-    /* 0x0a */  {true, &output_pins_state.rows[5].cols[5]}, // USB_KEY_G => g
+    /* 0x09 */  {true, &output_pins_state.rows[5].cols[2]}, // USB_KEY_F => f
+    /* 0x0a */  {true, &output_pins_state.rows[2].cols[3]}, // USB_KEY_G => g
     /* 0x0b */  {true, &output_pins_state.rows[5].cols[3]}, // USB_KEY_H => h
     /* 0x0c */  {true, &output_pins_state.rows[1].cols[4]}, // USB_KEY_I => i
-    /* 0x0d */  {true, &output_pins_state.rows[5].cols[4]}, // USB_KEY_K => k
-    /* 0x0e */  {false, nullptr},
+    /* 0x0d */  {true, &output_pins_state.rows[2].cols[4]}, // USB_KEY_J => j
+    /* 0x0e */  {true, &output_pins_state.rows[5].cols[4]}, // USB_KEY_K => k
     /* 0x0f */  {true, &output_pins_state.rows[2].cols[5]}, // USB_KEY_L => l
     /* 0x10 */  {true, &output_pins_state.rows[4].cols[4]}, // USB_KEY_M => m
     /* 0x11 */  {true, &output_pins_state.rows[7].cols[4]}, // USB_KEY_N => n
@@ -89,21 +89,21 @@ KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1] = {
     /* 0x51 */  {true, &output_pins_state.rows[7].cols[0]}, // USB_KEY_DOWN => CURS_DU
     /* 0x52 */  {true, &output_pins_state.rows[7].cols[0]}, // USB_KEY_UP => CURS_DU
     /* 0x53 */  {false, nullptr},
-    /* 0x54 */  {false, nullptr},
-    /* 0x55 */  {false, nullptr},
-    /* 0x56 */  {true, &output_pins_state.rows[2].cols[9]}, // USB_KEY_KP_MINUS => KP-
-    /* 0x57 */  {true, &output_pins_state.rows[1].cols[9]}, // USB_KEY_KP_PLUS => KP+
+    /* 0x54 */  {true, &output_pins_state.rows[7].cols[6]}, // USB_KEY_KP_SLASH => KP_/
+    /* 0x55 */  {true, &output_pins_state.rows[1].cols[6]}, // USB_KEY_KP_STAR => KP_*
+    /* 0x56 */  {true, &output_pins_state.rows[2].cols[9]}, // USB_KEY_KP_MINUS => KP_-
+    /* 0x57 */  {true, &output_pins_state.rows[1].cols[9]}, // USB_KEY_KP_PLUS => KP_+
     /* 0x58 */  {true, &output_pins_state.rows[4].cols[9]}, // USB_KEY_KP_ENTER => KP_ENTER
-    /* 0x59 */  {true, &output_pins_state.rows[1].cols[10]}, // USB_KEY_KP_0 => KP_0
-    /* 0x5a */  {true, &output_pins_state.rows[7].cols[8]}, // USB_KEY_KP_1 => KP_1
-    /* 0x5b */  {true, &output_pins_state.rows[4].cols[8]}, // USB_KEY_KP_2 => KP_2
-    /* 0x5c */  {true, &output_pins_state.rows[7].cols[9]}, // USB_KEY_KP_3 => KP_3
-    /* 0x5d */  {true, &output_pins_state.rows[5].cols[8]}, // USB_KEY_KP_4 => KP_4
-    /* 0x5e */  {true, &output_pins_state.rows[2].cols[8]}, // USB_KEY_KP_5 => KP_5
-    /* 0x5f */  {true, &output_pins_state.rows[5].cols[9]}, // USB_KEY_KP_6 => KP_6
-    /* 0x60 */  {true, &output_pins_state.rows[6].cols[8]}, // USB_KEY_KP_7 => KP_7
-    /* 0x61 */  {true, &output_pins_state.rows[1].cols[8]}, // USB_KEY_KP_8 => KP_8
-    /* 0x62 */  {true, &output_pins_state.rows[6].cols[9]}, // USB_KEY_KP_9 => KP_9
+    /* 0x59 */  {true, &output_pins_state.rows[7].cols[8]}, // USB_KEY_KP_1 => KP_1
+    /* 0x5a */  {true, &output_pins_state.rows[4].cols[8]}, // USB_KEY_KP_2 => KP_2
+    /* 0x5b */  {true, &output_pins_state.rows[7].cols[9]}, // USB_KEY_KP_3 => KP_3
+    /* 0x5c */  {true, &output_pins_state.rows[5].cols[8]}, // USB_KEY_KP_4 => KP_4
+    /* 0x5d */  {true, &output_pins_state.rows[2].cols[8]}, // USB_KEY_KP_5 => KP_5
+    /* 0x5e */  {true, &output_pins_state.rows[5].cols[9]}, // USB_KEY_KP_6 => KP_6
+    /* 0x5f */  {true, &output_pins_state.rows[6].cols[8]}, // USB_KEY_KP_7 => KP_7
+    /* 0x60 */  {true, &output_pins_state.rows[1].cols[8]}, // USB_KEY_KP_8 => KP_8
+    /* 0x61 */  {true, &output_pins_state.rows[6].cols[9]}, // USB_KEY_KP_9 => KP_9
+    /* 0x62 */  {true, &output_pins_state.rows[1].cols[10]}, // USB_KEY_KP_0 => KP_0
     /* 0x63 */  {true, &output_pins_state.rows[2].cols[10]}, // USB_KEY_KP_DOT => KP_.
     /* 0x64 */  {false, nullptr},
     /* 0x65 */  {false, nullptr},
@@ -112,7 +112,7 @@ KeyInfo usb_key_mapping[MAX_USB_KEY_CODE + 1] = {
     /* 0x68 */  {true, &output_pins_state.rows[7].cols[1]}, // USB_KEY_LSHIFT => LSHIFT
     /* 0x69 */  {true, &output_pins_state.rows[0].cols[10]}, // USB_KEY_LALT => ALT
     /* 0x6a */  {false, nullptr},
-    /* 0x6b */  {false, nullptr},
+    /* 0x6b */  {true, &output_pins_state.rows[2].cols[7]}, // USB_KEY_RCTRL => CTRL
     /* 0x6c */  {true, &output_pins_state.rows[4].cols[6]}, // USB_KEY_RSHIFT => RSHIFT
     /* 0x6d */  {true, &output_pins_state.rows[0].cols[10]}, // USB_KEY_RALT => ALT
     /* 0x6e */  {false, nullptr},

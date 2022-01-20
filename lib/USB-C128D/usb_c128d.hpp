@@ -12,7 +12,7 @@ class USB_C128D {
         enum SpecialKey { restore, caps_lock, forty_eighty };
 
         /** 
-         * @brief Initialize the C128D keyboard interface 
+         * @brief Initialize internal data structures and dependencies
          */
         void begin();
 

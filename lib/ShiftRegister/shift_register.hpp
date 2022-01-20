@@ -20,12 +20,8 @@ class OutputShiftRegister {
         }
 
         void set_output_pins(uint8_t pins_state) {
-            uint8_t mask;
-            for (mask=0x80; mask; mask >>= 1) {
-                    digitalWrite(_data_pin, pins_state & mask);
-                    digitalWrite(_clock_pin, HIGH);
-                    digitalWrite(_clock_pin, LOW);
-            }
+            digitalWrite(_latch_pin, LOW);
+            shiftOut(_data_pin, _clock_pin, MSBFIRST, pins_state);
             digitalWrite(_latch_pin, HIGH);
             digitalWrite(_latch_pin, LOW);
         }

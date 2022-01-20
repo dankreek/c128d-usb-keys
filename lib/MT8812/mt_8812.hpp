@@ -9,6 +9,11 @@
 class MT8812 {
     public:
         /**
+         * @brief Initialize all uC pins and dependencies
+         */
+        virtual void begin() = 0;
+        
+        /**
          * @brief Set the switch object
          * 
          * @param column 
