@@ -49,7 +49,16 @@ class Teensy36_USB_C128D : public USB_C128D {
                     break;
             }
 
-            digitalWrite(pin, !is_closed);
+            if (is_closed) {
+                // On the original hardware, special keys were directly sent to 
+                // ground when closed. For this implementation we will just set 
+                // them to LOW, which is effectively the same thing.
+                pinMode(pin, OUTPUT);
+                digitalWrite(pin, LOW);
+            } else {
+                // If key not pressed set to INPUT indicating "no connection"
+                pinMode(pin, INPUT);
+            }
         };
 
         void reset_output_matrix() { 

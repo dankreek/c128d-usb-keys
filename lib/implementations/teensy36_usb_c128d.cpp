@@ -34,17 +34,14 @@ void forty_eighty_toggled(bool is_set) {
 
 
 void Teensy36_USB_C128D::begin() {
-    // Setup special keys
-    pinMode(restore_key_pin, OUTPUT);
-    pinMode(forty_eighty_key_pin, OUTPUT);
-    pinMode(capslock_key_pin, OUTPUT);
-    digitalWrite(restore_key_pin, HIGH);
-    digitalWrite(forty_eighty_key_pin, HIGH);
-    digitalWrite(capslock_key_pin, HIGH);
+    // Setup special keys, INPUT means "no connection"
+    pinMode(restore_key_pin, INPUT);
+    pinMode(forty_eighty_key_pin, INPUT);
+    pinMode(capslock_key_pin, INPUT);
 
+    // Setup lock key indicator LED's
     pinMode(c128_caps_lock_led_pin, OUTPUT);
     digitalWrite(c128_caps_lock_led_pin, LOW);
-
     pinMode(c128_4080_lock_led_pin, OUTPUT);
     digitalWrite(c128_4080_lock_led_pin, LOW);
 
