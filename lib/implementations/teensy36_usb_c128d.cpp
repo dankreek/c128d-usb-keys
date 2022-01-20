@@ -77,7 +77,8 @@ OutputShiftRegister shift_register = OutputShiftRegister(
 
 MT8812ShiftRegister mt8812 = MT8812ShiftRegister(
     &shift_register,
-    Teensy36_USB_C128D::mt8812_strobe_pin
+    Teensy36_USB_C128D::mt8812_strobe_pin,
+    Teensy36_USB_C128D::mt8812_reset_pin
 );
 
 Teensy36_USB_C128D implementation = Teensy36_USB_C128D(&mt8812);
