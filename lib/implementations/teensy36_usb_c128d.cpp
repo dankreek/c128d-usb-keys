@@ -34,6 +34,10 @@ void forty_eighty_toggled(bool is_set) {
 
 
 void Teensy36_USB_C128D::begin() {
+    // Turn on the "power" LED
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
+
     // Setup special keys, INPUT means "no connection"
     pinMode(restore_key_pin, INPUT);
     pinMode(forty_eighty_key_pin, INPUT);
