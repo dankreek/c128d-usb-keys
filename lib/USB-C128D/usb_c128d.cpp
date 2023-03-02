@@ -1,3 +1,4 @@
+// #include <Arduino.h>
 #include <cstring>
 #include "usb_c128d.hpp"
 
@@ -23,6 +24,8 @@ void USB_C128D::usb_key_down(uint8_t usb_key_code) {
     } else if (usb_key_code == c128_4080_lock_key.usb_key_code()) {
         c128_4080_lock_key.toggle_on_state();
     } else {
+        // Serial.write("Key down: ");
+        // Serial.println(usb_key_code);
         usb_key_buffer.add(usb_key_code);
     }
 }

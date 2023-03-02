@@ -245,7 +245,7 @@ void test_4080_lock_key() {
     TEST_ASSERT_TRUE_MESSAGE(
         usb_c128d.c128_4080_lock_key.is_on(),
         "The 40/80 LockKey toggle is set to true"
-    )
+    );
 
     usb_c128d.usb_key_up(usb_c128d.c128_4080_lock_key.usb_key_code());
     usb_c128d.task();
@@ -266,7 +266,7 @@ void test_4080_lock_key() {
     TEST_ASSERT_FALSE_MESSAGE(
         usb_c128d.c128_4080_lock_key.is_on(),
         "The 40/80 LockKey toggle is set to false"
-    )
+    );
 
     usb_c128d.usb_key_up(usb_c128d.c128_4080_lock_key.usb_key_code());
     usb_c128d.task();

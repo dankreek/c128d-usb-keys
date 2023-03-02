@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "lock_key.hpp"
+#include <lock_key.hpp>
 #include "key_mapping.hpp"
 
 
@@ -16,9 +16,8 @@ void test_set_is_on() {
 
     TEST_ASSERT_FALSE(lock_key.is_on());
     lock_key.set_is_on(true);
-    TEST_ASSERT_TRUE(lock_key.is_on())
+    TEST_ASSERT_TRUE(lock_key.is_on());
 }
-
 
 void test_toggle_on_state() {
     LockKey lock_key(USB_KEY_F4);
