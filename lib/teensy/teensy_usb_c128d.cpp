@@ -3,7 +3,7 @@
 #include <USBHost_t36.h>
 #include <mt_8812_shift_register.hpp>
 #include <eeprom_funcs.hpp>
-#include "teensy40_usb_c128d.hpp"
+#include "teensy_usb_c128d.hpp"
 
 // Add a USB host, support two hubs and use the first keyboard found
 USBHost usb_host;
@@ -21,23 +21,23 @@ void raw_release(uint8_t key_code) {
 }
 
 
-bool Teensy40_USB_C128D::is_usb_capslock() { return keyboard.capsLock(); }
-bool Teensy40_USB_C128D::is_usb_numlock() { return keyboard.numLock(); }
+bool Teensy_USB_C128D::is_usb_capslock() { return keyboard.capsLock(); }
+bool Teensy_USB_C128D::is_usb_numlock() { return keyboard.numLock(); }
 
 
 void capslock_toggled(bool is_set) {
-    digitalWrite(Teensy40_USB_C128D::c128_caps_lock_led_pin, is_set ? HIGH : LOW);
-    write_eeprom_bool(Teensy40_USB_C128D::eeprom_caps_lock_key_address, is_set);
+    digitalWrite(Teensy_USB_C128D::c128_caps_lock_led_pin, is_set ? HIGH : LOW);
+    write_eeprom_bool(Teensy_USB_C128D::eeprom_caps_lock_key_address, is_set);
 }
 
 
 void forty_eighty_toggled(bool is_set) {
-    digitalWrite(Teensy40_USB_C128D::c128_4080_lock_led_pin, is_set ? HIGH : LOW);
-    write_eeprom_bool(Teensy40_USB_C128D::eeprom_40_80_key_address, is_set);
+    digitalWrite(Teensy_USB_C128D::c128_4080_lock_led_pin, is_set ? HIGH : LOW);
+    write_eeprom_bool(Teensy_USB_C128D::eeprom_40_80_key_address, is_set);
 }
 
 
-void Teensy40_USB_C128D::begin() {
+void Teensy_USB_C128D::begin() {
     // Wait for serial output to be ready
     while (!Serial) {};
 
@@ -64,15 +64,15 @@ void Teensy40_USB_C128D::begin() {
         is_capslock_set = false;
         is_4080_set = false;
 
-        write_eeprom_bool(Teensy40_USB_C128D::eeprom_caps_lock_key_address, false);
-        write_eeprom_bool(Teensy40_USB_C128D::eeprom_caps_lock_key_address, false);
+        write_eeprom_bool(Teensy_USB_C128D::eeprom_caps_lock_key_address, false);
+        write_eeprom_bool(Teensy_USB_C128D::eeprom_caps_lock_key_address, false);
 
         // Set EEPROM to recognize the first startup has happened
-        write_eeprom_bool(Teensy40_USB_C128D::eeprom_first_startup_address, false);
-        EEPROM.write(Teensy40_USB_C128D::eeprom_version_address, 0);
+        write_eeprom_bool(Teensy_USB_C128D::eeprom_first_startup_address, false);
+        EEPROM.write(Teensy_USB_C128D::eeprom_version_address, 0);
     } else {
-        is_capslock_set = read_eeprom_bool(Teensy40_USB_C128D::eeprom_caps_lock_key_address);
-        is_4080_set = read_eeprom_bool(Teensy40_USB_C128D::eeprom_40_80_key_address);
+        is_capslock_set = read_eeprom_bool(Teensy_USB_C128D::eeprom_caps_lock_key_address);
+        is_4080_set = read_eeprom_bool(Teensy_USB_C128D::eeprom_40_80_key_address);
     }
 
     // Set output pins to C128D
@@ -95,28 +95,28 @@ void Teensy40_USB_C128D::begin() {
     keyboard.attachRawRelease(raw_release);
 }
 
-bool Teensy40_USB_C128D::is_first_startup() {
-    return !read_eeprom_bool(Teensy40_USB_C128D::eeprom_first_startup_address);
+bool Teensy_USB_C128D::is_first_startup() {
+    return !read_eeprom_bool(Teensy_USB_C128D::eeprom_first_startup_address);
 }
 
 // allow the USB host to read the keyboard and perform callbacks before
 // recalculating output
-void Teensy40_USB_C128D::task() {
+void Teensy_USB_C128D::task() {
     usb_host.Task();
     USB_C128D::task();
 }
 
 OutputShiftRegister shift_register = OutputShiftRegister(
-    Teensy40_USB_C128D::shift_register_data,
-    Teensy40_USB_C128D::shift_register_clock,
-    Teensy40_USB_C128D::shift_register_latch
+    Teensy_USB_C128D::shift_register_data,
+    Teensy_USB_C128D::shift_register_clock,
+    Teensy_USB_C128D::shift_register_latch
 );
 
 MT8812ShiftRegister mt8812 = MT8812ShiftRegister(
     &shift_register,
-    Teensy40_USB_C128D::mt8812_strobe_pin,
-    Teensy40_USB_C128D::mt8812_reset_pin
+    Teensy_USB_C128D::mt8812_strobe_pin,
+    Teensy_USB_C128D::mt8812_reset_pin
 );
 
-Teensy40_USB_C128D implementation = Teensy40_USB_C128D(&mt8812);
+Teensy_USB_C128D implementation = Teensy_USB_C128D(&mt8812);
 

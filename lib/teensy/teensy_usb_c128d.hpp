@@ -6,9 +6,9 @@
 #include <mt_8812.hpp>
 
 
-class Teensy40_USB_C128D : public USB_C128D {
+class Teensy_USB_C128D : public USB_C128D {
     public:
-        Teensy40_USB_C128D(MT8812* mt8812) { this->_mt8812 = mt8812; }
+        Teensy_USB_C128D(MT8812* mt8812) { this->_mt8812 = mt8812; }
 
         void begin();
         void task();
@@ -19,6 +19,7 @@ class Teensy40_USB_C128D : public USB_C128D {
         static const int eeprom_caps_lock_key_address = 2;
         static const int eeprom_40_80_key_address = 3;
 
+        // Output pin numbers
         static const uint8_t c128_caps_lock_led_pin = 23;
         static const uint8_t c128_4080_lock_led_pin = 22;
 
@@ -91,6 +92,6 @@ class Teensy40_USB_C128D : public USB_C128D {
         bool is_first_startup();
 };
 
-extern Teensy40_USB_C128D implementation;
+extern Teensy_USB_C128D implementation;
 
 #endif
