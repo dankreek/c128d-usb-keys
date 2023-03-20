@@ -19,8 +19,6 @@ void restore_lock_key_states() {
 
 
 void setup() {
-	// Setup debugging output
-	Serial.begin(115200);
 	implementation.begin();
 }
 

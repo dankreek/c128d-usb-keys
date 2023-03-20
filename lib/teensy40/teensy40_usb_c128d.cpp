@@ -38,6 +38,9 @@ void forty_eighty_toggled(bool is_set) {
 
 
 void Teensy40_USB_C128D::begin() {
+    // Wait for serial output to be ready
+    while (!Serial) {};
+
     // Turn on the "power" LED
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH);
