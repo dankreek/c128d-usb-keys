@@ -1,7 +1,6 @@
-#include <Arduino.h>
+#if BUILD_ENV_NAME==teensy40 or BUILD_ENV_NAME==teensy36
 #include <teensy_usb_c128d.hpp>
-#include <shift_register.hpp>
-#include <mt_8812_shift_register.hpp>
+#endif
 
 
 void setup() {
