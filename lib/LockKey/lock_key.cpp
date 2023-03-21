@@ -30,7 +30,6 @@ uint8_t LockKey::usb_key_code() {
 
 void LockKey::set_toggle_callback(void (*toggle_callback)(bool)) {
     _toggle_callback = toggle_callback;
-    _call_callback();
 }
 
 void LockKey::_call_callback() {

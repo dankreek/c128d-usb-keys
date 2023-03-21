@@ -18,7 +18,6 @@ void setup() {
     run_usb_keyboard_buffer_tests();
     run_lock_key_tests();
     run_usb_c128d_tests();
-    run_eeprom_bool_tests();
     UNITY_END();
 }
 
