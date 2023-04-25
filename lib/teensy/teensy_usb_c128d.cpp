@@ -6,6 +6,7 @@
 
 // Add a USB host, support two hubs and use the first keyboard found
 USBHost usb_host;
+USBHIDParser hid1(usb_host);
 USBHub hub1(usb_host);
 USBHub hub2(usb_host);
 KeyboardController keyboard(usb_host);
