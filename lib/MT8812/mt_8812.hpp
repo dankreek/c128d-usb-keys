@@ -24,6 +24,7 @@ class MT8812 {
             set_strobe_pin(false);
             set_switch_pins(column, row, is_closed);
             set_strobe_pin(true);
+            delayNanoseconds(20);
             set_strobe_pin(false);
         }
 

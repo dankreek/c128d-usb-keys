@@ -32,7 +32,6 @@ class Teensy_USB_C128D : public USB_C128D {
         static const uint8_t capslock_key_pin = 16;
 
         static const uint8_t mt8812_strobe_pin = 9;
-        static const uint8_t mt8812_reset_pin = 8;
 
     protected:
         bool is_usb_capslock(); 
