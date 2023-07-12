@@ -8,6 +8,7 @@
 
 class Teensy_USB_C128D : public USB_C128D {
     public:
+        explicit
         Teensy_USB_C128D(MT8812* mt8812) { this->_mt8812 = mt8812; }
 
         void begin();
@@ -32,19 +33,16 @@ class Teensy_USB_C128D : public USB_C128D {
         static const uint8_t capslock_key_pin = 16;
 
         static const uint8_t mt8812_strobe_pin = 9;
-        static const uint8_t mt8812_reset_pin = 8;
 
     protected:
-        bool is_usb_capslock(); 
-        bool is_usb_numlock();
+        bool is_usb_capslock() override; 
+        bool is_usb_numlock() override;
 
-        // @implements
-        void set_switch(uint8_t row, uint8_t column, bool is_closed) {
+        void set_switch(uint8_t row, uint8_t column, bool is_closed) override {
             _mt8812->set_switch(column, row, is_closed);
-        }
+        } 
 
-        // @implements
-        void set_special_key(SpecialKey key, bool is_closed) {
+        void set_special_key(SpecialKey key, bool is_closed) override {
             uint8_t pin = 0;
 
             switch (key) {
@@ -71,8 +69,7 @@ class Teensy_USB_C128D : public USB_C128D {
             }
         };
 
-        // @implements
-        void reset_output_matrix() { 
+        void reset_output_matrix() override { 
             _mt8812->reset(); 
         }
     

@@ -9,11 +9,25 @@ struct SpecialKeys {
     bool restore;    
     bool forty_eighty;
     bool caps_lock;
+
+    SpecialKeys() {
+        this->reset();
+    }
+
+    void reset() {
+        this->restore = false;
+        this->forty_eighty = false;
+        this->caps_lock = false;
+    }
 };
 
 // One row of pins in the keybaord matrix
 struct PinsRow {
     bool cols[11]; 
+
+    PinsRow() {
+        this->reset();
+    }
 
     void reset() {
         for (int i=0; i < 11; i++) cols[i] = false;
@@ -25,14 +39,16 @@ struct PinsState {
     PinsRow rows[8];       
     SpecialKeys special;
 
+    PinsState() {
+        this->reset();
+    }
+
     void reset() {
         for (int i=0; i < 8; i++) {
             rows[i].reset();
         }
 
-        special.caps_lock = false;
-        special.forty_eighty = false;
-        special.restore = false;
+        special.reset();
     }
 };
 

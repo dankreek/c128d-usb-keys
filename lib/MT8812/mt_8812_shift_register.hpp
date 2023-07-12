@@ -19,7 +19,7 @@ class MT8812ShiftRegister: public MT8812 {
          * 
          * @param shift_register reference to a shift register connected directly to the uC
          * @param strobe_pin Arduino pin number connected to the MT8812 STROBE pin
-         * @param reset_pin Arduino pin number connected to the MT8812 RESET pin
+         * @param reset_pin Arduino pin number connected to the MT8812 RESET pin, if set to 0 then all switches are opened manually
          */
         MT8812ShiftRegister(OutputShiftRegister* shift_register, uint8_t strobe_pin, uint8_t reset_pin) {
             this->_strobe_pin = strobe_pin;
@@ -38,11 +38,20 @@ class MT8812ShiftRegister: public MT8812 {
         }
 
         void reset() {
-            digitalWrite(_reset_pin, HIGH);
-            // The calls to digitalWrite are most likely plenty long enough
-            // but adding the 40ns delay just in case. 
-            delayNanoseconds(40);
-            digitalWrite(_reset_pin, LOW);
+            if (_reset_pin == 0) {
+                for (int col=0; col < 12; col++) {
+                    for (int row=0; row < 8; row++) {
+                        set_switch_pins(col, row, false);
+                    }
+                }
+            }
+            else {
+                digitalWrite(_reset_pin, HIGH);
+                // The calls to digitalWrite are most likely plenty long enough
+                // but adding the 40ns delay just in case. 
+                delayNanoseconds(40);
+                digitalWrite(_reset_pin, LOW);
+            }
         }
 
     protected:
