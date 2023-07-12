@@ -9,6 +9,7 @@ class LockKey {
         /**
          * @param usb_key_code - USB key code which this lock key is triggered by
          */
+        explicit 
         LockKey(uint8_t usb_key_code);
 
         /**

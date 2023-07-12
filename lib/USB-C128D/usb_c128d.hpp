@@ -6,6 +6,7 @@
 #include "lock_key.hpp"
 #include "key_mapping.hpp"
 
+// cppcheck-suppress noConstructor
 class USB_C128D {
     public:
         /** A special key that should be set or unset */
