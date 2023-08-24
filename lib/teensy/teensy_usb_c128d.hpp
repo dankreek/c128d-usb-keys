@@ -5,8 +5,38 @@
 #include <usb_c128d.hpp>
 #include <mt_8812.hpp>
 
+/** 
+ * Mapping of C128D keyboard matrix rows/cols to rows/cols on the MT8812.
+ * 
+ * This is required to allow for an easier layout on the PCB.
+ */
+constexpr int mt8812_row[] = {
+    [0] = 4,
+    [1] = 5,
+    [2] = 7,
+    [3] = 0,
+    [4] = 3,
+    [5] = 2,
+    [6] = 1,
+    [7] = 6
+};
+
+constexpr int mt8812_col[] = {
+    [0] = 10,
+    [1] = 5,
+    [2] = 4,
+    [3] = 3,
+    [4] = 2,
+    [5] = 1,
+    [6] = 0,
+    [7] = 7,
+    [8] = 6,
+    [9] = 9,
+    [10] = 8
+};
 
 class Teensy_USB_C128D : public USB_C128D {
+
     public:
         explicit
         Teensy_USB_C128D(MT8812* mt8812) { this->_mt8812 = mt8812; }
@@ -38,8 +68,12 @@ class Teensy_USB_C128D : public USB_C128D {
         bool is_usb_capslock() override; 
         bool is_usb_numlock() override;
 
-        void set_switch(uint8_t row, uint8_t column, bool is_closed) override {
-            _mt8812->set_switch(column, row, is_closed);
+        void set_switch(uint8_t c128d_row, uint8_t c128d_col, bool is_closed) override {
+            _mt8812->set_switch(
+                mt8812_col[c128d_col], 
+                mt8812_row[c128d_row], 
+                is_closed
+            );
         } 
 
         void set_special_key(SpecialKey key, bool is_closed) override {
@@ -76,6 +110,7 @@ class Teensy_USB_C128D : public USB_C128D {
     private:
         MT8812* _mt8812;
 
+
         /**
          * @brief Is this the first time starting up the Teensy?
          * 
@@ -87,6 +122,8 @@ class Teensy_USB_C128D : public USB_C128D {
          * @return false If not first startup
          */
         bool is_first_startup();
+
+
 };
 
 extern Teensy_USB_C128D implementation;
