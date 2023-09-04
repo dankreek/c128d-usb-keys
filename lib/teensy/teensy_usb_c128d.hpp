@@ -51,8 +51,8 @@ class Teensy_USB_C128D : public USB_C128D {
         static const int eeprom_40_80_key_address = 3;
 
         // Output pin numbers
-        static const uint8_t c128_caps_lock_led_pin = 23;
-        static const uint8_t c128_4080_lock_led_pin = 22;
+        static const uint8_t c128_4080_lock_led_pin = 7;
+        static const uint8_t c128_caps_lock_led_pin = 8;
 
         static const uint8_t shift_register_data = 10;
         static const uint8_t shift_register_latch = 11;
